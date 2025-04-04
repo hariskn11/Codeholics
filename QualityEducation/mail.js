@@ -4,8 +4,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'thechaosloop@gmail.com', // Your Gmail
-        pass: 'qabf dchl teza hrdz' // App Password (not regular password)
+        user: 'xxxxx@gmail.com', // Your Gmail
+        pass: 'xxxx xxxx xxxx xxxx' // App Password (not regular password)
     }
 });
 
@@ -30,10 +30,9 @@ const students = [
 
 // List of NGO emails
 const ngoEmails = [
-    "2k22aids12@kiot.ac.in",
-    "2k22aids24@kiot.ac.in",
-    "2k22aids48@kiot.ac.in",
-    "2k22aids23@kiot.ac.in"
+    "xx@gmail.com",
+    "yy@gmail.com",
+    "zz@gmail.com"
 ];
 
 async function sendHighScoreNotifications() {

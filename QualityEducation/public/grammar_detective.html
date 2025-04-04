@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Detective Adventure 🕵️‍♂️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            text-align: center;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: white;
+            text-shadow: 3px 3px 0 #ff8a00, -1px -1px 0 #e52e71;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .game-container {
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .sentence-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sentence {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .word {
+            padding: 12px 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .word::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255,255,255,0.3),
+                rgba(255,255,255,0)
+            );
+            transform: rotate(30deg);
+        }
+
+        .word-input {
+            border: 3px solid #4CAF50;
+            padding: 8px 12px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            width: 100px;
+            text-align: center;
+            font-family: 'Comic Sans MS', cursive;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #feedback {
+            font-weight: bold;
+            font-size: 1.5em;
+            margin: 20px;
+            min-height: 40px;
+        }
+
+        #timer {
+            font-size: 1.5em;
+            margin: 15px 0;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .character {
+            width: 100px;
+            height: 100px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .character:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .celebration h2 {
+            font-size: 3em;
+            color: #ff5e62;
+            text-shadow: 3px 3px 0 #ffcc00;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .score-display {
+            font-size: 1.3em;
+            margin: 10px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .level-display {
+            font-size: 1.2em;
+            margin: 10px;
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        .question-count {
+            font-size: 1.1em;
+            margin: 10px;
+            color: #ff8a00;
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.5s ease;
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Grammar Detective Adventure 🕵️‍♂️</h1>
+        <div class="subtitle">Fix the sentences before time runs out!</div>
+    </div>
+
+    <div class="game-container">
+        <div class="level-display">Level: 1</div>
+        <div class="question-count">Question: 1/5</div>
+        <div class="score-display">Score: 0</div>
+        <div id="timer">⏱️ Time: 30s</div>
+        
+        <div class="sentence-container">
+            <p>Click on the incorrect words to fix them!</p>
+            <div class="sentence" id="sentence">
+                <!-- Words will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <p id="feedback"></p>
+
+        <button onclick="checkAnswer()">Check Answer</button>
+        <button onclick="nextSentence()">Skip Sentence</button>
+    </div>
+
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjI1MCIgZmlsbD0iI2ZmYzEwNyIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjAwIiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMTgwIiByPSIzMCIgZmlsbD0iIzAwMDAwMCIvPjxjaXJjbGUgY3g9IjMzMCIgY3k9IjE4MCIgcj0iMzAiIGZpbGw9IiMwMDAwMDAiLz48cGF0aCBkPSJNMTgwLDMzMCBRMjU2LDQwMCAzMzAsMzMwIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMTAiIGZpbGw9Im5vbmUiLz48L3N2Zz4=" 
+         class="character" alt="Detective character" title="Help me fix these sentences!">
+
+    <div class="celebration" id="celebration">
+        <h2>Great Job! 🎉</h2>
+        <button onclick="nextSentence()">Next Sentence</button>
+    </div>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
+
+    <script>
+        // Game elements
+        const sentenceElement = document.getElementById('sentence');
+        const feedbackElement = document.getElementById('feedback');
+        const timerElement = document.getElementById('timer');
+        const celebrationElement = document.getElementById('celebration');
+        
+        // Audio elements
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const winSound = document.getElementById('winSound');
+        const clickSound = document.getElementById('clickSound');
+        
+        // Game variables
+        let timeLeft = 60;
+        let timer;
+        let currentSentence = [];
+        let correctSentence = [];
+        let score = 0;
+        let level = 1;
+        let questionNumber = 1;
+        let gameActive = true;
+        
+        // Sentences database - 5 questions per level
+        const sentences = {
+            1: [
+                {
+                    incorrect: ["she", "has", "a", "apple"],
+                    correct: ["She", "has", "an", "apple"],
+                    hint: "Remember capitalization and article rules!"
+                },
+                {
+                    incorrect: ["they", "is", "going", "to", "the", "park"],
+                    correct: ["They", "are", "going", "to", "the", "park"],
+                    hint: "Check subject-verb agreement and articles!"
+                },
+                {
+                    incorrect: ["i", "likes", "to", "eated", "cookie"],
+                    correct: ["I", "like", "to", "eat", "cookies"],
+                    hint: "Watch verb conjugation and pluralization!"
+                },
+                {
+                    incorrect: ["him", "go", "to", "store", "yesterday"],
+                    correct: ["He", "went", "to", "the", "store", "yesterday"],
+                    hint: "Check pronouns and past tense!"
+                },
+                {
+                    incorrect: ["we", "was", "happy", "when", "sun", "shine"],
+                    correct: ["We", "were", "happy", "when", "the", "sun", "shone"],
+                    hint: "Watch plural verbs and irregular past tense!"
+                }
+            ],
+            2: [
+                {
+                    incorrect: ["the", "dog", "chase", "it", "tail"],
+                    correct: ["The", "dog", "chases", "its", "tail"],
+                    hint: "Check verb conjugation and possessive pronouns!"
+                },
+                {
+                    incorrect: ["her", "write", "a", "letter", "every", "day"],
+                    correct: ["She", "writes", "a", "letter", "every", "day"],
+                    hint: "Check pronouns and subject-verb agreement!"
+                },
+                {
+                    incorrect: ["there", "is", "many", "book", "on", "shelf"],
+                    correct: ["There", "are", "many", "books", "on", "the", "shelf"],
+                    hint: "Watch plural nouns and articles!"
+                },
+                {
+                    incorrect: ["yesterday", "i", "see", "a", "amazing", "movie"],
+                    correct: ["Yesterday", "I", "saw", "an", "amazing", "movie"],
+                    hint: "Check past tense and articles!"
+                },
+                {
+                    incorrect: ["the", "childrens", "plays", "in", "park"],
+                    correct: ["The", "children", "play", "in", "the", "park"],
+                    hint: "Watch irregular plurals and verb agreement!"
+                }
+            ],
+            3: [
+                {
+                    incorrect: ["me", "and", "him", "goes", "to", "school"],
+                    correct: ["He", "and", "I", "go", "to", "school"],
+                    hint: "Check pronoun usage and verb agreement!"
+                },
+                {
+                    incorrect: ["she", "don't", "has", "no", "pencil"],
+                    correct: ["She", "doesn't", "have", "a", "pencil"],
+                    hint: "Watch negative forms and articles!"
+                },
+                {
+                    incorrect: ["the", "cat", "sleep", "on", "sofa"],
+                    correct: ["The", "cat", "sleeps", "on", "the", "sofa"],
+                    hint: "Check verb conjugation and articles!"
+                },
+                {
+                    incorrect: ["they", "was", "here", "earlier"],
+                    correct: ["They", "were", "here", "earlier"],
+                    hint: "Watch plural subject-verb agreement!"
+                },
+                {
+                    incorrect: ["can", "you", "helps", "me", "with", "this"],
+                    correct: ["Can", "you", "help", "me", "with", "this"],
+                    hint: "Check verb forms after modal verbs!"
+                }
+            ]
+        };
+        
+        // Initialize the game
+        function initGame() {
+            loadSentence();
+            startTimer();
+            updateScoreDisplay();
+            updateQuestionCount();
+        }
+        
+        // Load a new sentence
+        function loadSentence() {
+            const levelSentences = sentences[level];
+            if (!levelSentences) {
+                // No more levels - game completed
+                feedbackElement.textContent = "Congratulations! You've completed all levels!";
+                document.querySelector('.game-container').style.display = 'none';
+                return;
+            }
+            
+            const sentenceData = levelSentences[questionNumber - 1];
+            currentSentence = [...sentenceData.incorrect];
+            correctSentence = [...sentenceData.correct];
+            
+            // Clear previous sentence
+            sentenceElement.innerHTML = '';
+            
+            // Create word elements
+            currentSentence.forEach((word, index) => {
+                const wordElement = document.createElement('span');
+                wordElement.className = 'word bounce-in';
+                wordElement.textContent = word;
+                wordElement.onclick = () => editWord(wordElement, index);
+                sentenceElement.appendChild(wordElement);
+            });
+            
+            feedbackElement.textContent = sentenceData.hint;
+            feedbackElement.style.color = '#4facfe';
+        }
+        
+        // Start timer
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 60;
+            timerElement.textContent = `⏱️ Time: ${timeLeft}s`;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `⏱️ Time: ${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+        
+        // Edit a word
+        function editWord(wordElement, index) {
+            if (!gameActive) return;
+            
+            clickSound.currentTime = 0;
+            clickSound.play().catch(e => console.log("Click sound error:", e));
+            
+            const wordText = wordElement.textContent;
+            const input = document.createElement('input');
+            input.className = 'word-input';
+            input.value = wordText;
+            
+            input.addEventListener('blur', () => {
+                const newWord = input.value.trim();
+                if (newWord) {
+                    wordElement.textContent = newWord;
+                    currentSentence[index] = newWord;
+                    wordElement.onclick = () => editWord(wordElement, index);
+                }
+            });
+            
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            });
+            
+            wordElement.innerHTML = '';
+            wordElement.appendChild(input);
+            input.focus();
+        }
+        
+        // Check the answer
+        function checkAnswer() {
+            if (!gameActive) return;
+            
+            if (JSON.stringify(currentSentence) === JSON.stringify(correctSentence)) {
+                // Correct answer
+                correctSound.currentTime = 0;
+                correctSound.play().catch(e => console.log("Correct sound error:", e));
+                
+                score += timeLeft * level; // More points for faster completion
+                updateScoreDisplay();
+                
+                feedbackElement.textContent = "Perfect! 🎉";
+                feedbackElement.style.color = "#4CAF50";
+                
+                endGame(true);
+            } else {
+                // Wrong answer
+                wrongSound.currentTime = 0;
+                wrongSound.play().catch(e => console.log("Wrong sound error:", e));
+                
+                feedbackElement.textContent = "Oops! Try again. ❌";
+                feedbackElement.style.color = "#ff5e62";
+                feedbackElement.classList.add('shake');
+                
+                setTimeout(() => {
+                    feedbackElement.classList.remove('shake');
+                }, 500);
+            }
+        }
+        
+        // End the game (win or lose)
+        function endGame(win) {
+            gameActive = false;
+            clearInterval(timer);
+            
+            if (win) {
+                winSound.currentTime = 0;
+                winSound.play().catch(e => console.log("Win sound error:", e));
+                
+                createConfetti();
+                celebrationElement.style.display = 'flex';
+            } else {
+                // Show correct answer
+                sentenceElement.innerHTML = '';
+                correctSentence.forEach(word => {
+                    const wordElement = document.createElement('span');
+                    wordElement.className = 'word';
+                    wordElement.textContent = word;
+                    sentenceElement.appendChild(wordElement);
+                });
+                
+                feedbackElement.textContent = "Time's up! The correct sentence is above.";
+                feedbackElement.style.color = "#ff5e62";
+            }
+        }
+        
+        // Go to next sentence
+        function nextSentence() {
+            celebrationElement.style.display = 'none';
+            
+            // Move to next question or next level
+            questionNumber++;
+            
+            const levelSentences = sentences[level];
+            if (questionNumber > levelSentences.length) {
+                // Move to next level
+                level++;
+                questionNumber = 1;
+                document.querySelector('.level-display').textContent = `Level: ${level}`;
+            }
+            
+            updateQuestionCount();
+            gameActive = true;
+            loadSentence();
+            startTimer();
+        }
+        
+        // Update score display
+        function updateScoreDisplay() {
+            document.querySelector('.score-display').textContent = `Score: ${score}`;
+        }
+        
+        // Update question count display
+        function updateQuestionCount() {
+            const levelSentences = sentences[level] || sentences[1];
+            document.querySelector('.question-count').textContent = `Question: ${questionNumber}/${levelSentences.length}`;
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff5e62', '#ff9966', '#4facfe', '#00f2fe', '#a18cd1', '#fbc2eb', '#ffcc00', '#66ff66'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Start the game when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // Enable audio after first user interaction
+            document.addEventListener('click', () => {
+                correctSound.play().catch(e => console.log("Audio play prevented:", e));
+            }, { once: true });
+            
+            initGame();
+        });
+    </script>
+</body>
+</html>

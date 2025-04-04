@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn with Fun - Profile</title>
+    <style>
+        /* Your existing CSS remains unchanged */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(to right, indigo, violet);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            font-size: 16px;
+        }
+
+        .dashboard-btn {
+            background-color: #2a3547;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 25px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .profile-section {
+            margin-top: 80px;
+        }
+
+        .profile-title {
+            font-size: 64px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .profile-subtitle {
+            font-size: 28px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .profile-details {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 30px;
+            width: 500px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .details-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            margin-right: 5px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            opacity: 0.9;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 25px 0;
+        }
+
+        .scoreboard-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .subject-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #6c5ce7;
+        }
+
+        .subject-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 15px 0;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .visualization-btn {
+            background-color: #993aff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 0;
+            width: 90%;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 25px auto 0;
+        }
+
+        .encouragement {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/home.html" class="logo">
+            <svg class="logo-img" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 32C12 22.059 20.059 14 30 14C39.941 14 48 22.059 48 32" stroke="white" stroke-width="2"/>
+                <path d="M31.5 25L31.5 35" stroke="white" stroke-width="2"/>
+                <path d="M26.5 30L36.5 30" stroke="white" stroke-width="2"/>
+                <path d="M20 40L40 40" stroke="white" stroke-width="2"/>
+            </svg>
+            <div class="logo-text">Learn<br>with Fun</div>
+        </a>
+        <div class="nav-links">
+            <a href="#">About</a>
+            <a href="#">Academy</a>
+            <a href="#">Features</a>
+            <a href="/profile.html">Profile</a>
+        </div>
+        <button class="dashboard-btn" onclick="window.location.href='/home.html'">Dashboard</button>
+    </nav>
+
+    <div class="content">
+        <div class="profile-section">
+            <h1 class="profile-title">Your Profile</h1>
+            <h2 class="profile-subtitle" id="username">Loading...</h2>
+            <p class="encouragement">Keep going up!</p>
+        </div>
+
+        <div class="profile-details">
+            <h3 class="details-title">Personal Details</h3>
+            
+            <div class="detail-row">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value" id="detail-username">Loading...</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Standard:</span>
+                <span class="detail-value" id="detail-standard">Loading...</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Age:</span>
+                <span class="detail-value" id="detail-age">Loading...</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">School:</span>
+                <span class="detail-value" id="detail-school">Loading...</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Medium:</span>
+                <span class="detail-value" id="detail-medium">Loading...</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <h3 class="scoreboard-title">Score Board</h3>
+            <div id="subject-scores">
+                <!-- Scores will be dynamically inserted here -->
+            </div>
+            
+            <button class="visualization-btn">Visualization</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = localStorage.getItem('userId');
+            console.log('Retrieved userId from localStorage:', userId);
+
+            if (!userId) {
+                console.log('No userId found, redirecting to login');
+                alert('Please log in to view your profile');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                console.log('Fetching profile data for userId:', userId);
+                const response = await fetch('/api/profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load profile');
+                }
+
+                // Update profile details
+                document.getElementById('username').textContent = data.username || 'N/A';
+                document.getElementById('detail-username').textContent = data.username || 'N/A';
+                document.getElementById('detail-standard').textContent = data.standard || 'Not set';
+                document.getElementById('detail-age').textContent = data.dob ? calculateAge(data.dob) : 'Not set';
+                document.getElementById('detail-school').textContent = data.school_name || 'Not set';
+                document.getElementById('detail-medium').textContent = data.medium || 'Not set';
+
+                // Placeholder for subject scores
+                const subjectScores = {
+                    tamil: { currentScore: 75, lastScore: 60 },
+                    english: { currentScore: 82, lastScore: 70 },
+                    mathematics: { currentScore: 65, lastScore: 68 }
+                };
+                renderSubjectScores(subjectScores);
+
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                alert('Failed to load profile. Please try again.');
+                window.location.href = '/login.html';
+            }
+        });
+
+        // Function to calculate age from DOB
+        function calculateAge(dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // Function to render subject scores
+        function renderSubjectScores(subjects) {
+            const container = document.getElementById('subject-scores');
+            let html = '';
+
+            for (const [subject, data] of Object.entries(subjects)) {
+                html += `
+                    <div class="subject-card">
+                        <div class="subject-title">${subject.charAt(0).toUpperCase() + subject.slice(1)}</div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${data.currentScore}%"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span>Current: ${data.currentScore}%</span>
+                            <span>Last: ${data.lastScore}%</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

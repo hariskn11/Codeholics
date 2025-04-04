@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Visualization</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; margin: 20px 0; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .container { max-width: 1200px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Users Table</h1>
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Password Hash</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h1>Student Details Table</h1>
+        <table id="studentDetailsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Standard</th>
+                    <th>School</th>
+                    <th>DOB</th>
+                    <th>Medium</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const [usersResponse, detailsResponse] = await Promise.all([
+                    fetch('/api/admin/users'),
+                    fetch('/api/admin/student-details')
+                ]);
+    
+                if (!usersResponse.ok) throw new Error(`Users error: ${usersResponse.status}`);
+                if (!detailsResponse.ok) throw new Error(`Details error: ${detailsResponse.status}`);
+    
+                const [users, details] = await Promise.all([
+                    usersResponse.json(),
+                    detailsResponse.json()
+                ]);
+    
+                renderTable('#usersTable tbody', users, ['id', 'username', 'email', 'password']);
+                renderTable('#studentDetailsTable tbody', details, ['id', 'user_id', 'username', 'standard', 'school_name', 'dob', 'medium']);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+            }
+        }
+    
+        function renderTable(selector, data, fields) {
+            const tableBody = document.querySelector(selector);
+            tableBody.innerHTML = data.map(item => `
+                <tr>
+                    ${fields.map(field => `<td>${item[field] || ''}</td>`).join('')}
+                </tr>
+            `).join('');
+        }
+    
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.color = 'red';
+            errorDiv.style.padding = '10px';
+            errorDiv.textContent = `Error: ${message}`;
+            document.body.prepend(errorDiv);
+        }
+    
+        loadData();
+    </script>
+</body>
+</html>

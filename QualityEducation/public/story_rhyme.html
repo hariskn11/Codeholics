@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Story Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        body { 
+            font-family: 'Comic Neue', cursive; 
+            text-align: center; 
+            background: linear-gradient(to right, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        
+        h1 {
+            font-size: 42px;
+            margin-top: 10px;
+            text-shadow: 3px 3px 0px rgba(255,255,255,0.8);
+            color: #ff5722;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {transform: translateY(0);}
+            50% {transform: translateY(-10px);}
+        }
+        
+        #game-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        #story {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 25px;
+            border-radius: 20px;
+            font-size: 22px;
+            margin: 20px auto;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            border: 4px dashed #ff9800;
+            position: relative;
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {border-color: #ff9800;}
+            33% {border-color: #8bc34a;}
+            66% {border-color: #03a9f4;}
+            100% {border-color: #ff9800;}
+        }
+        
+        #question-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        #question {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #e91e63;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        button { 
+            padding: 15px 30px; 
+            margin: 5px; 
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer;
+            font-size: 22px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+        
+        button:hover::after {
+            left: 100%;
+        }
+        
+        #result {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px;
+            min-height: 40px;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
+        }
+        
+        #timer {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px;
+            color: #2196f3;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
+            animation: pulse 1s infinite alternate;
+        }
+        
+        .character {
+            position: absolute;
+            width: 100px;
+            transition: all 0.5s;
+            z-index: 10;
+        }
+        
+        #cat {
+            bottom: 20px;
+            left: -120px;
+            animation: slideIn 1s forwards 0.5s;
+        }
+        
+        #dog {
+            top: 20px;
+            right: -120px;
+            animation: slideIn 1s forwards 0.8s;
+        }
+        
+        @keyframes slideIn {
+            to {transform: translateX(0);}
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 3s linear forwards;
+        }
+        
+        @keyframes fall {
+            to {transform: translateY(100vh) rotate(720deg); opacity: 0;}
+        }
+        
+        .star {
+            position: absolute;
+            color: gold;
+            font-size: 30px;
+            animation: twinkle 1s infinite alternate;
+            opacity: 0;
+        }
+        
+        @keyframes twinkle {
+            to {opacity: 1; transform: scale(1.5);}
+        }
+        
+        .progress-container {
+            width: 80%;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            margin: 20px auto;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 100%;
+            transition: width 0.3s;
+            border-radius: 15px;
+        }
+        
+        .score-display {
+            font-size: 24px;
+            margin: 10px;
+            color: #ff5722;
+            font-weight: bold;
+        }
+        
+        .next-btn {
+            display: none;
+            margin: 20px auto;
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <img src="https://cdn.pixabay.com/photo/2017/02/20/18/03/cat-2083492_960_720.png" alt="Cat" class="character" id="cat">
+        <img src="https://cdn.pixabay.com/photo/2016/12/13/05/15/puppy-1903313_960_720.png" alt="Dog" class="character" id="dog">
+        
+        <h1>✨ Magic Story Quiz ✨</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div class="score-display">Score: <span id="score">0</span></div>
+        
+        <p id="timer">⏱️ Time: 15s</p>
+        
+        <div id="story">
+            <p>Once upon a time, a little cat named Tom loved to play in the garden. He had a best friend named Jerry the mouse. Every afternoon, they would chase butterflies and nap under the big oak tree.</p>
+        </div>
+        
+        <div id="question-container">
+            <div id="question">
+                <p>What was the cat's name?</p>
+            </div>
+            <div class="options">
+                <button onclick="checkAnswer('Tom')">Tom</button>
+                <button onclick="checkAnswer('Jerry')">Jerry</button>
+                <button onclick="checkAnswer('Spike')">Spike</button>
+                <button onclick="checkAnswer('Mittens')">Mittens</button>
+            </div>
+        </div>
+        
+        <p id="result"></p>
+        
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➡️</button>
+    </div>
+    
+    <audio id="correct-sound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3" preload="auto"></audio>
+    <audio id="wrong-sound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+    <audio id="tick-sound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+    
+    <script>
+        // Game variables
+        let timeLeft = 15;
+        let score = 0;
+        let currentQuestion = 0;
+        let timer;
+        const timerDisplay = document.getElementById('timer');
+        const progressBar = document.getElementById('progress');
+        const scoreDisplay = document.getElementById('score');
+        const nextBtn = document.getElementById('next-btn');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        const tickSound = document.getElementById('tick-sound');
+        
+        // Questions array
+        const questions = [
+            {
+                story: "Once upon a time, a little cat named Tom loved to play in the garden. He had a best friend named Jerry the mouse. Every afternoon, they would chase butterflies and nap under the big oak tree.",
+                question: "What was the cat's name?",
+                options: ["Tom", "Jerry", "Spike", "Mittens"],
+                answer: "Tom"
+            },
+            {
+                story: "One sunny day, Tom and Jerry found a magic bone buried under the oak tree. The bone was glowing with rainbow colors! They decided to take it to the wise old owl for advice.",
+                question: "What did they find under the tree?",
+                options: ["A magic bone", "A treasure chest", "A sleeping bear", "A lost puppy"],
+                answer: "A magic bone"
+            },
+            {
+                story: "The wise old owl told them the bone could grant three wishes. Tom wished for endless tuna fish, Jerry wished for a cheese moon, and together they wished for eternal friendship.",
+                question: "How many wishes could the bone grant?",
+                options: ["One", "Two", "Three", "Unlimited"],
+                answer: "Three"
+            },
+            {
+                story: "Their wishes came true! Tom had tuna falling from the sky, the moon turned into a giant cheese wheel, and they remained best friends forever. They shared their magic with all the animals in the forest.",
+                question: "What did the moon turn into?",
+                options: ["A giant cookie", "A cheese wheel", "A balloon", "A spaceship"],
+                answer: "A cheese wheel"
+            }
+        ];
+        
+        // Initialize game
+        function initGame() {
+            score = 0;
+            currentQuestion = 0;
+            updateScore();
+            loadQuestion();
+        }
+        
+        // Load question
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                endGame();
+                return;
+            }
+            
+            const q = questions[currentQuestion];
+            document.getElementById('story').innerHTML = `<p>${q.story}</p>`;
+            document.getElementById('question').innerHTML = `<p>${q.question}</p>`;
+            
+            const optionsContainer = document.querySelector('.options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = function() { checkAnswer(option); };
+                optionsContainer.appendChild(button);
+            });
+            
+            startTimer();
+            nextBtn.style.display = 'none';
+            document.getElementById('result').textContent = '';
+        }
+        
+        // Start timer
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 15;
+            timerDisplay.textContent = `⏱️ Time: ${timeLeft}s`;
+            timerDisplay.style.color = '#2196f3';
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `⏱️ Time: ${timeLeft}s`;
+                
+                if (timeLeft <= 5) {
+                    timerDisplay.style.color = '#f44336';
+                    if (timeLeft > 0) {
+                        tickSound.currentTime = 0;
+                        tickSound.play();
+                    }
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerDisplay.textContent = "⏱️ Time's up!";
+                    wrongSound.play();
+                    showResult(false);
+                    createStars(10, false);
+                    nextBtn.style.display = 'block';
+                }
+            }, 1000);
+        }
+        
+        // Check answer
+        function checkAnswer(answer) {
+            clearInterval(timer);
+            const q = questions[currentQuestion];
+            const result = document.getElementById('result');
+            
+            if (answer === q.answer) {
+                result.textContent = "Correct! 🎉🌟";
+                result.style.color = "#4caf50";
+                correctSound.play();
+                score += timeLeft * 10;
+                updateScore();
+                createStars(20, true);
+                createConfetti(30);
+            } else {
+                result.textContent = `Oops! The answer was ${q.answer}. ❌`;
+                result.style.color = "#f44336";
+                wrongSound.play();
+                createStars(5, false);
+            }
+            
+            nextBtn.style.display = 'block';
+        }
+        
+        // Next question
+        function nextQuestion() {
+            currentQuestion++;
+            updateProgress();
+            loadQuestion();
+        }
+        
+        // Update score
+        function updateScore() {
+            scoreDisplay.textContent = score;
+        }
+        
+        // Update progress
+        function updateProgress() {
+            const progress = (currentQuestion / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // End game
+        function endGame() {
+            document.getElementById('story').innerHTML = `
+                            <h2>Game Over!</h2>
+                            <p>Your final score is: ${score}</p>
+                            <p>${score > 500 ? '🌟 Amazing job! You\'re a story master! 🌟' : 'Good try! Play again to improve your score!'}</p>
+                        `;
+            document.getElementById('question-container').style.display = 'none';
+            timerDisplay.style.display = 'none';
+            nextBtn.style.display = 'none';
+            createConfetti(100);
+        }
+        
+        // Create confetti
+        function createConfetti(count) {
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+        
+        // Create stars
+        function createStars(count, isCorrect) {
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.innerHTML = isCorrect ? '🌟' : '⭐';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.animationDelay = Math.random() + 's';
+                document.body.appendChild(star);
+                
+                setTimeout(() => {
+                    star.remove();
+                }, 1000);
+            }
+        }
+        
+        // Show result
+        function showResult(isCorrect) {
+            const result = document.getElementById('result');
+            if (isCorrect) {
+                result.textContent = "Correct! 🎉🌟";
+                result.style.color = "#4caf50";
+            } else {
+                result.textContent = "Try again! ❌";
+                result.style.color = "#f44336";
+            }
+        }
+        
+        // Initialize the game
+        window.onload = initGame;
+    </script>
+</body>
+</html>

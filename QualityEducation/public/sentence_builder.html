@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Sentence Builder Adventure 🚀</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        body { 
+            font-family: 'Comic Neue', cursive, sans-serif; 
+            text-align: center; 
+            background: linear-gradient(135deg, #ff5e62, #ff9966, #ffcc33, #33cc33, #3399ff);
+            background-size: 400% 400%;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        h1 { 
+            font-size: 36px;
+            margin: 10px 0;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: calc(100vh - 40px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .level-display {
+            font-size: 24px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .question-display {
+            font-size: 20px;
+            background: rgba(255,255,255,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .word-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            min-height: 80px;
+            width: 90%;
+        }
+        
+        .word { 
+            padding: 12px 18px; 
+            margin: 8px; 
+            background: linear-gradient(145deg, #ffcc00, #ff9900);
+            cursor: grab; 
+            border-radius: 12px; 
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            color: #333;
+            position: relative;
+        }
+        
+        .word:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 6px 6px 12px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+        
+        .word:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        #sentence-area { 
+            display: flex;
+            justify-content: center;
+            min-height: 100px; 
+            border: 4px dashed rgba(255,255,255,0.7); 
+            margin: 10px 0; 
+            padding: 15px; 
+            width: 90%;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(255,255,255,0.5);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .timer-container {
+            width: 90%;
+            max-width: 500px;
+            height: 30px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A, #FFEB3B, #FF9800, #FF5722);
+            border-radius: 15px;
+            transition: width 1s linear;
+        }
+        
+        .timer-text {
+            font-size: 24px; 
+            margin: 5px 0; 
+            font-weight: bold;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+        
+        button { 
+            padding: 12px 25px; 
+            margin: 8px; 
+            cursor: pointer; 
+            background: linear-gradient(145deg, #4CAF50, #2E7D32);
+            color: white; 
+            border: none; 
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 3px solid rgba(255,255,255,0.5);
+        }
+        
+        button:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #message { 
+            font-size: 24px; 
+            margin: 10px 0; 
+            font-weight: bold;
+            min-height: 30px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+        
+        .character {
+            font-size: 60px;
+            margin: 10px 0;
+            cursor: pointer;
+            animation: jump 2s infinite;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        
+        @keyframes jump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: gold;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 1s infinite alternate, float 3s forwards;
+            z-index: 10;
+        }
+        
+        @keyframes twinkle {
+            to { transform: scale(1.5); opacity: 0.8; }
+        }
+        
+        @keyframes float {
+            to { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .progress-container {
+            width: 90%;
+            max-width: 500px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 15px;
+            background: linear-gradient(to right, #FF5722, #FF9800, #FFEB3B, #8BC34A, #4CAF50);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 28px;
+            z-index: 100;
+            animation: zoomIn 0.5s;
+            display: none;
+        }
+        
+        @keyframes zoomIn {
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .question-counter {
+            font-size: 18px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        .hidden {
+            display: none;
+        }
+
+        #next-level.hidden {
+            display: none;
+        }
+
+        .level-up.hidden {
+            display: none;
+        }
+
+        .level-up.hidden {
+            display: none;
+        }
+
+        #next-question.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div>
+            <h1>🌟 Sentence Builder Adventure 🚀</h1>
+            <div class="level-display">Level: <span id="level">1</span></div>
+            <div class="question-counter">Question: <span id="current-question">1</span>/5</div>
+            <div class="question-display" id="question-display"></div>
+            
+            <div class="timer-container">
+                <div class="timer-bar" id="timer-bar"></div>
+            </div>
+            <div class="timer-text" id="timer-text">⏱️ Time: 30s</div>
+            
+            <div class="word-container" id="words"></div>
+            
+            <div id="sentence-area"></div>
+            
+            <div id="message"></div>
+            <button id="next-question" class="hidden">⏭️ Next Question</button>
+            <button id="next-level" class="hidden">🚀 Next Level</button>
+        <div>
+            <button id="check">✅ Check Answer</button>
+            <button id="next-question" style="display:none;">⏭️ Next Question</button>
+            <button id="next-level" style="display:none;">🚀 Next Level</button>
+            
+        <div class="level-up hidden" id="question-complete">Correct! 👍</div>
+        </div>
+        
+        <div class="level-up" id="level-up">Level Complete! 🎉</div>
+        <div class="level-up" id="question-complete" style="display:none;">Correct! 👍</div>
+    </div>
+    
+    <script>
+        // Game data - progressive difficulty levels with 5 questions each
+        const levels = [
+            { // Level 1
+                questions: [
+                    {
+                        words: ["I", "see", "a", "cat"],
+                        correct: "I see a cat",
+                        time: 60
+                    },
+                    {
+                        words: ["The", "dog", "runs", "fast"],
+                        correct: "The dog runs fast",
+                        time: 60
+                    },
+                    {
+                        words: ["My", "mom", "cooks", "food"],
+                        correct: "My mom cooks food",
+                        time: 60
+                    },
+                    {
+                        words: ["We", "play", "in", "the", "park"],
+                        correct: "We play in the park",
+                        time: 60
+                    },
+                    {
+                        words: ["The", "sun", "is", "bright"],
+                        correct: "The sun is bright",
+                        time: 60
+                    }
+                ],
+                instructions: "Build simple sentences with 3-4 words"
+            },
+            { // Level 2
+                questions: [
+                    {
+                        words: ["She", "reads", "a", "book", "every", "day"],
+                        correct: "She reads a book every day",
+                        time: 60
+                    },
+                    {
+                        words: ["Our", "teacher", "gives", "us", "homework"],
+                        correct: "Our teacher gives us homework",
+                        time: 60
+                    },
+                    {
+                        words: ["I", "like", "to", "eat", "pizza"],
+                        correct: "I like to eat pizza",
+                        time: 60
+                    },
+                    {
+                        words: ["The", "baby", "sleeps", "in", "the", "crib"],
+                        correct: "The baby sleeps in the crib",
+                        time: 60
+                    },
+                    {
+                        words: ["They", "go", "to", "school", "by", "bus"],
+                        correct: "They go to school by bus",
+                        time: 60
+                    }
+                ],
+                instructions: "Build longer sentences with 5-6 words"
+            },
+            { // Level 3
+                questions: [
+                    {
+                        words: ["Yesterday", "we", "visited", "the", "new", "museum", "downtown"],
+                        correct: "Yesterday we visited the new museum downtown",
+                        time: 60
+                    },
+                    {
+                        words: ["My", "favorite", "color", "is", "blue", "because", "it's", "calming"],
+                        correct: "My favorite color is blue because it's calming",
+                        time: 60
+                    },
+                    {
+                        words: ["The", "children", "played", "happily", "in", "the", "park", "all", "afternoon"],
+                        correct: "The children played happily in the park all afternoon",
+                        time: 60
+                    },
+                    {
+                        words: ["After", "school", "I", "usually", "do", "my", "homework", "first"],
+                        correct: "After school I usually do my homework first",
+                        time: 60
+                    },
+                    {
+                        words: ["We", "should", "always", "remember", "to", "say", "please", "and", "thank", "you"],
+                        correct: "We should always remember to say please and thank you",
+                        time: 60
+                    }
+                ],
+                instructions: "Build complex sentences with 7+ words"
+            }
+        ];
+        
+        // Game variables
+        let currentLevel = 0;
+        let currentQuestion = 0;
+        let timeLeft = levels[currentLevel].questions[currentQuestion].time;
+        let timer;
+        const wordsContainer = document.getElementById('words');
+        const sentenceArea = document.getElementById('sentence-area');
+        const timerBar = document.getElementById('timer-bar');
+        const timerText = document.getElementById('timer-text');
+        const checkButton = document.getElementById('check');
+        const nextQuestionButton = document.getElementById('next-question');
+        const nextLevelButton = document.getElementById('next-level');
+        const message = document.getElementById('message');
+        const levelDisplay = document.getElementById('level');
+        const questionDisplay = document.getElementById('question-display');
+        const currentQuestionDisplay = document.getElementById('current-question');
+        const levelUpPopup = document.getElementById('level-up');
+        const questionCompletePopup = document.getElementById('question-complete');
+        const mascot = document.getElementById('mascot');
+        const mascots = ['🐵', '🦁', '🐶', '🐱', '🐻', '🐰', '🦊', '🐨'];
+        let currentMascot = 0;
+        
+        // Initialize game
+        function initGame() {
+            loadQuestion(currentLevel, currentQuestion);
+            setupCharacter();
+        }
+        
+        // Load question
+        function loadQuestion(levelIndex, questionIndex) {
+            // Clear previous words
+            wordsContainer.innerHTML = '';
+            sentenceArea.innerHTML = '';
+            message.textContent = '';
+            nextQuestionButton.style.display = 'none';
+            nextLevelButton.style.display = 'none';
+            
+            // Set level and question displays
+            levelDisplay.textContent = levelIndex + 1;
+            currentQuestionDisplay.textContent = questionIndex + 1;
+            
+            // Set question instruction
+            questionDisplay.textContent = levels[levelIndex].instructions;
+            
+            // Set time for this question
+            timeLeft = levels[levelIndex].questions[questionIndex].time;
+            
+            // Create word tiles
+            shuffleArray(levels[levelIndex].questions[questionIndex].words).forEach(word => {
+                const wordDiv = document.createElement('div');
+                wordDiv.classList.add('word');
+                wordDiv.textContent = word;
+                wordDiv.draggable = true;
+                wordsContainer.appendChild(wordDiv);
+            });
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+            
+            // Start timer
+            startTimer();
+            
+            // Update progress bar
+            updateProgressBar();
+        }
+        
+        // Setup drag and drop functionality
+        function setupDragAndDrop() {
+            const words = document.querySelectorAll('.word');
+            
+            words.forEach(word => {
+                word.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.textContent);
+                    e.target.classList.add('dragging');
+                    createStars(3, e.target.getBoundingClientRect());
+                });
+                
+                word.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            sentenceArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dragging = document.querySelector('.dragging');
+                const afterElement = getDragAfterElement(sentenceArea, e.clientX);
+                
+                if (afterElement == null) {
+                    sentenceArea.appendChild(dragging);
+                } else {
+                    sentenceArea.insertBefore(dragging, afterElement);
+                }
+            });
+        }
+        
+        function getDragAfterElement(container, x) {
+            const draggableElements = [...container.querySelectorAll('.word:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+        
+        // Timer functions
+        function startTimer() {
+            clearInterval(timer);
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    showMessage("Time's up! ⏰ Try again!", "#ff5555");
+                    createStars(5);
+                    setTimeout(() => loadQuestion(currentLevel, currentQuestion), 2000);
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const percentage = (timeLeft / levels[currentLevel].questions[currentQuestion].time) * 100;
+            timerBar.style.width = `${percentage}%`;
+            timerText.textContent = `⏱️ Time: ${timeLeft}s`;
+            
+            // Change color based on time left
+            if (timeLeft <= levels[currentLevel].questions[currentQuestion].time * 0.3) {
+                timerBar.style.background = "linear-gradient(to right, #FF5722, #FF0000)";
+                timerText.style.color = "#ff0000";
+                timerText.style.animation = "pulse 0.5s infinite";
+            } else if (timeLeft <= levels[currentLevel].questions[currentQuestion].time * 0.6) {
+                timerBar.style.background = "linear-gradient(to right, #FF9800, #FF5722)";
+                timerText.style.color = "#FF9800";
+                timerText.style.animation = "none";
+            } else {
+                timerText.style.animation = "none";
+            }
+        }
+        
+        // Check answer
+        checkButton.addEventListener('click', checkAnswer);
+        
+        function checkAnswer() {
+            const formedSentence = Array.from(sentenceArea.children)
+                                      .map(el => el.textContent)
+                                      .join(' ')
+                                      .trim();
+            
+            if (formedSentence === levels[currentLevel].questions[currentQuestion].correct) {
+                questionComplete();
+            } else {
+                showMessage("Oops! Try again! 🤔", "#ff6666");
+                animateShake();
+                createStars(5);
+            }
+        }
+        
+        function questionComplete() {
+            clearInterval(timer);
+            showMessage("Perfect! 🎉", "#66ff66");
+            animateSuccess();
+            createStars(10);
+            
+            // Show question complete popup
+            questionCompletePopup.style.display = 'block';
+            setTimeout(() => {
+                questionCompletePopup.style.display = 'none';
+            }, 1000);
+            
+            // Check if it's the last question in the level
+            if (currentQuestion < levels[currentLevel].questions.length - 1) {
+                // Show next question button
+                nextQuestionButton.style.display = 'inline-block';
+            } else {
+                // Show level complete message and next level button
+                levelUpPopup.style.display = 'block';
+                setTimeout(() => {
+                    levelUpPopup.style.display = 'none';
+                }, 1500);
+                
+                if (currentLevel < levels.length - 1) {
+                    nextLevelButton.style.display = 'inline-block';
+                } else {
+                    showMessage("You beat all levels! 🏆", "#66ff66");
+                    setTimeout(() => {
+                        currentLevel = 0;
+                        currentQuestion = 0;
+                        loadQuestion(currentLevel, currentQuestion);
+                    }, 3000);
+                }
+            }
+        }
+        
+        // Next question
+        nextQuestionButton.addEventListener('click', () => {
+            currentQuestion++;
+            loadQuestion(currentLevel, currentQuestion);
+        });
+        
+        // Next level
+        nextLevelButton.addEventListener('click', () => {
+            currentLevel++;
+            currentQuestion = 0;
+            loadQuestion(currentLevel, currentQuestion);
+        });
+        
+        // Progress tracking
+        function updateProgressBar() {
+            const levelProgress = (currentLevel / levels.length) * 100;
+            const questionProgress = (currentQuestion / levels[currentLevel].questions.length) * 100;
+            const totalProgress = levelProgress + (questionProgress / levels.length);
+            document.querySelector('.progress-bar').style.width = `${totalProgress}%`;
+        }
+        
+        // Animations
+        function animateSuccess() {
+            document.querySelectorAll('.word').forEach(word => {
+                word.style.animation = "jump 0.5s";
+                setTimeout(() => {
+                    word.style.animation = "";
+                }, 500);
+            });
+        }
+        
+        function animateShake() {
+            sentenceArea.style.animation = "shake 0.5s";
+            setTimeout(() => {
+                sentenceArea.style.animation = "";
+            }, 500);
+        }
+        
+        function showMessage(msg, color) {
+            message.textContent = msg;
+            message.style.color = color;
+            message.style.textShadow = `2px 2px 0 ${color}33`;
+            message.style.animation = "none";
+            void message.offsetWidth; // Trigger reflow
+            message.style.animation = "bounce 0.5s";
+        }
+        
+        // Visual effects
+        function createStars(count = 5, position = null) {
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                if (position) {
+                    star.style.left = `${position.left + position.width/2 - 10 + Math.random()*20}px`;
+                    star.style.top = `${position.top + position.height/2 - 10 + Math.random()*20}px`;
+                } else {
+                    star.style.left = `${Math.random() * 100}vw`;
+                    star.style.top = `${Math.random() * 100}vh`;
+                }
+                
+                star.style.animationDelay = `${i*0.1}s`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 3000);
+            }
+        }
+        
+        // Character interaction
+        function setupCharacter() {
+            mascot.addEventListener('click', () => {
+                currentMascot = (currentMascot + 1) % mascots.length;
+                mascot.textContent = mascots[currentMascot];
+                createStars(10);
+                showMessage("Great job! 👍", "#3399ff");
+            });
+        }
+        
+        // Helper functions
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // Initialize the game
+        initGame();
+        
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+                20%, 40%, 60%, 80% { transform: translateX(10px); }
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

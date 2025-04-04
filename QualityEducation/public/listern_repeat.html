@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Words Adventure 🎤✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Chalkboard', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            text-align: center;
+            color: #333;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+            border: 3px dashed white;
+            animation: rainbowBorder 8s linear infinite;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: white;
+            text-shadow: 3px 3px 0 #ffcc5c;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin: 5px 0;
+            color: white;
+            font-weight: bold;
+        }
+
+        .game-container {
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            border: 4px dotted #ffcc5c;
+        }
+
+        .word-display {
+            font-size: 2.5em;
+            margin: 15px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            color: #2c3e50;
+            border-radius: 15px;
+            min-height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+            border: 4px solid white;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-display:before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+            z-index: -1;
+            background-size: 400% 400%;
+            animation: gradientBG 8s ease infinite;
+            border-radius: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 15px 25px;
+            background: linear-gradient(to right, #ff8e53, #fe6b8b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 220px;
+            justify-content: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        button:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        button:hover:before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        button.secondary {
+            background: linear-gradient(to right, #56ccf2, #2f80ed);
+        }
+
+        .result-display {
+            font-weight: bold;
+            font-size: 1.8em;
+            margin: 15px;
+            min-height: 50px;
+            color: #2c3e50;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .score-display, .level-display {
+            font-size: 1.3em;
+            margin: 5px;
+            color: white;
+            font-weight: bold;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            padding: 8px 15px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            border: 2px solid white;
+        }
+
+        .level-display {
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+        }
+
+        .mic-icon {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: pulse 1.5s infinite;
+            border: 4px solid white;
+            position: relative;
+        }
+
+        .mic-icon:before {
+            content: "🎤";
+            font-size: 50px;
+            z-index: 2;
+        }
+
+        .mic-icon.active {
+            animation: pulseFast 0.8s infinite, rainbow 2s linear infinite;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            border: 2px solid white;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #ffcc5c, #ff9e2d);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .star {
+            font-size: 2.5em;
+            color: #ffcc5c;
+            text-shadow: 0 0 10px rgba(255,204,92,0.7);
+            transition: all 0.3s ease;
+            transform-origin: center bottom;
+        }
+
+        .star.active {
+            animation: starBounce 0.5s ease;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes pulseFast {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        @keyframes rainbowBorder {
+            0% { border-color: #ff9a9e; }
+            25% { border-color: #fad0c4; }
+            50% { border-color: #a1c4fd; }
+            75% { border-color: #c2e9fb; }
+            100% { border-color: #ff9a9e; }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes starBounce {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.5) rotate(15deg); }
+            60% { transform: scale(1.2) rotate(-10deg); }
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.3s ease;
+        }
+
+        .shake {
+            animation: shake 0.3s ease;
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .emoji-feedback {
+            position: absolute;
+            font-size: 3em;
+            pointer-events: none;
+            animation: float 1.5s ease-in forwards, fadeIn 0.3s ease;
+            opacity: 0;
+            z-index: 5;
+            text-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .celebration h2 {
+            font-size: 3em;
+            color: #ff6b6b;
+            text-shadow: 3px 3px 0 #ffcc00;
+            margin-bottom: 30px;
+            animation: pulse 1s infinite alternate;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .character {
+            position: absolute;
+            font-size: 3em;
+            z-index: 1;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .character-1 {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .character-2 {
+            top: 20%;
+            right: 5%;
+            animation-delay: 1s;
+        }
+
+        .character-3 {
+            bottom: 15%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: floatUp 10s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .word-display {
+                font-size: 1.8em;
+                padding: 15px;
+                min-height: 100px;
+            }
+            
+            button {
+                min-width: 160px;
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+            
+            .mic-icon {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .character {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Magic Words Adventure ✨</h1>
+        <div class="subtitle">Say the words and collect stars!</div>
+    </div>
+
+    <div class="game-container">
+        <!-- Floating characters -->
+        <div class="character character-1">🐵</div>
+        <div class="character character-2">🦄</div>
+        <div class="character character-3">🐶</div>
+        
+        <!-- Bubbles background -->
+        <div id="bubbles-container"></div>
+        
+        <div class="stats-container">
+            <span class="level-display">Level: 1</span>
+            <span class="score-display">Score: 0</span>
+        </div>
+        
+        <div class="stars">
+            <div class="star">⭐</div>
+            <div class="star">⭐</div>
+            <div class="star">⭐</div>
+            <div class="star">⭐</div>
+            <div class="star">⭐</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="word-display" id="word-display">Ready to play!</div>
+        
+        <div class="mic-icon" id="mic-icon"></div>
+
+        <div class="button-container">
+            <button onclick="playSound()">🔊 Play Sound</button>
+            <button class="secondary" onclick="startListening()">🎤 Speak Now</button>
+        </div>
+
+        <div class="result-display" id="result"></div>
+    </div>
+
+    <div class="celebration" id="celebration">
+        <h2>Level Up! 🎉</h2>
+        <button onclick="nextWord()">Continue</button>
+    </div>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" preload="auto"></audio>
+    <audio id="popSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
+    <audio id="animalSound" src="https://assets.mixkit.co/sfx/preview/mixkit-animal-squeaks-105.mp3" preload="auto"></audio>
+
+    <script>
+        // Game elements
+        const wordDisplay = document.getElementById('word-display');
+        const resultDisplay = document.getElementById('result');
+        const micIcon = document.getElementById('mic-icon');
+        const progressBar = document.getElementById('progress-bar');
+        const celebrationElement = document.getElementById('celebration');
+        const stars = document.querySelectorAll('.star');
+        const bubblesContainer = document.getElementById('bubbles-container');
+        
+        // Audio elements
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const winSound = document.getElementById('winSound');
+        const clickSound = document.getElementById('clickSound');
+        const popSound = document.getElementById('popSound');
+        const animalSound = document.getElementById('animalSound');
+        
+        // Game variables
+        let recognition;
+        let score = 0;
+        let level = 1;
+        let currentIndex = 0;
+        let correctInRow = 0;
+        let isTransitioning = false;
+        
+        // Words database by level
+        const wordsByLevel = [
+            // Level 1 - Simple words (animals, colors, foods)
+            ["Cat", "Dog", "Sun", "Moon", "Red", "Blue", "Apple", "Banana", "Happy", "Jump"],
+            // Level 2 - Short phrases
+            ["Good job!", "I love you", "Thank you", "Good morning", "My name is", "Big house", "Little mouse"],
+            // Level 3 - Longer sentences
+            ["The sun is bright", "I like to play", "What is your name?", "Let's have fun", "The dog is happy"],
+            // Level 4 - Challenging sentences
+            ["Practice makes perfect", "Learning is so much fun", "Can you say this sentence?", "The quick fox jumps"]
+        ];
+        
+        // Initialize the game
+        function initGame() {
+            initializeSpeechRecognition();
+            loadLevel();
+            updateScoreDisplay();
+            createBubbles();
+            startAnimalSounds();
+        }
+        
+        // Create floating bubbles
+        function createBubbles() {
+            for (let i = 0; i < 15; i++) {
+                createBubble();
+            }
+        }
+        
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            // Random size between 20px and 60px
+            const size = Math.random() * 40 + 20;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            // Random position
+            bubble.style.left = `${Math.random() * 100}%`;
+            bubble.style.bottom = `-${size}px`;
+            
+            // Random animation duration between 8s and 15s
+            bubble.style.animationDuration = `${Math.random() * 7 + 8}s`;
+            
+            // Random delay
+            bubble.style.animationDelay = `${Math.random() * 5}s`;
+            
+            bubblesContainer.appendChild(bubble);
+            
+            // Remove bubble after animation completes
+            setTimeout(() => {
+                bubble.remove();
+                createBubble(); // Create a new bubble to replace this one
+            }, 15000);
+        }
+        
+        // Play random animal sounds
+        function startAnimalSounds() {
+            setInterval(() => {
+                playRandomAnimalSound();
+            }, 8000);
+        }
+        
+        function playRandomAnimalSound() {
+            const sounds = [
+                { emoji: "🐵", sound: 0.8 },
+                { emoji: "🦄", sound: 1.0 },
+                { emoji: "🐶", sound: 0.7 },
+                { emoji: "🐱", sound: 0.9 },
+                { emoji: "🐯", sound: 0.6 },
+                { emoji: "🦁", sound: 0.7 }
+            ];
+            const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+            createEmojiFeedback(randomSound.emoji, '#ff6b6b', true);
+            
+            animalSound.currentTime = 0;
+            animalSound.playbackRate = randomSound.sound;
+            animalSound.play().catch(e => console.log("Animal sound error:", e));
+        }
+        
+        // Load current level words
+        function loadLevel() {
+            words = [...wordsByLevel[level - 1]];
+            shuffleArray(words);
+            currentIndex = 0;
+            loadWord();
+        }
+        
+        // Initialize speech recognition
+        function initializeSpeechRecognition() {
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.continuous = false;
+
+                recognition.onresult = function(event) {
+                    isTransitioning = false;
+                    const spokenText = event.results[0][0].transcript;
+                    checkResult(spokenText);
+                };
+
+                recognition.onerror = function(event) {
+                    isTransitioning = false;
+                    resultDisplay.textContent = "Oops! Try again! " + ["🐵", "🦄", "🐶"][Math.floor(Math.random()*3)];
+                    resultDisplay.style.color = "#ff6b6b";
+                    micIcon.classList.remove('active');
+                    
+                    // Speak the word again when there's an error
+                    speakWord(words[currentIndex]);
+                };
+                
+                recognition.onspeechend = function() {
+                    isTransitioning = false;
+                    micIcon.classList.remove('active');
+                };
+            } else {
+                resultDisplay.textContent = "Sorry, your device doesn't support this game 😢";
+                resultDisplay.style.color = "#ff6b6b";
+            }
+        }
+        
+        // Speak a word using speech synthesis
+        function speakWord(word) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            
+            // Set a fun voice if available
+            const voices = window.speechSynthesis.getVoices();
+            const funVoice = voices.find(voice => voice.name.includes('Google UK') || voice.name.includes('Samantha'));
+            if (funVoice) {
+                utterance.voice = funVoice;
+                utterance.pitch = 1.2;
+                utterance.rate = 0.9;
+            }
+            
+            speechSynthesis.speak(utterance);
+        }
+        
+        // Load a new word
+        function loadWord() {
+            if (currentIndex >= words.length) {
+                currentIndex = 0;
+                shuffleArray(words);
+            }
+            
+            wordDisplay.textContent = words[currentIndex];
+            wordDisplay.className = "word-display bounce-in";
+            resultDisplay.textContent = "";
+            resultDisplay.style.color = "";
+            
+            // Update progress
+            progressBar.style.width = `${(correctInRow / 5) * 100}%`;
+            updateStars();
+            isTransitioning = false;
+        }
+        
+        // Update star display
+        function updateStars() {
+            stars.forEach((star, index) => {
+                if (index < correctInRow) {
+                    star.style.opacity = "1";
+                    if (!star.classList.contains('active')) {
+                        star.classList.add('active');
+                        setTimeout(() => {
+                            star.classList.remove('active');
+                        }, 500);
+                    }
+                } else {
+                    star.style.opacity = "0.3";
+                }
+            });
+        }
+        
+        // Play the current word
+        function playSound() {
+            if (isTransitioning) return;
+            
+            clickSound.currentTime = 0;
+            clickSound.play().catch(e => console.log("Click sound error:", e));
+            
+            speakWord(words[currentIndex]);
+        }
+        
+        // Start listening
+        function startListening() {
+            if (isTransitioning) return;
+            
+            if (recognition) {
+                isTransitioning = true;
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => console.log("Click sound error:", e));
+                
+                resultDisplay.textContent = "Listening... Speak now! " + ["🎤", "👂", "🗣️"][Math.floor(Math.random()*3)];
+                resultDisplay.style.color = "#2f80ed";
+                micIcon.classList.add('active');
+                
+                recognition.start();
+            } else {
+                resultDisplay.textContent = "Oops! Can't listen right now 😢";
+                resultDisplay.style.color = "#ff6b6b";
+            }
+        }
+        
+        // Normalize text for comparison
+        function normalizeText(text) {
+            return text.toLowerCase().replace(/[.,!?]/g, "").trim();
+        }
+        
+        // Check the result
+        function checkResult(spokenText) {
+            if (isTransitioning) return;
+            
+            const currentWord = words[currentIndex];
+            
+            if (normalizeText(spokenText) === normalizeText(currentWord)) {
+                // Correct answer
+                isTransitioning = true;
+                correctSound.currentTime = 0;
+                correctSound.play().catch(e => console.log("Correct sound error:", e));
+                
+                score += 10 * level;
+                correctInRow++;
+                
+                // Show feedback
+                const praise = getRandomPraise();
+                resultDisplay.textContent = praise.text;
+                resultDisplay.style.color = "#2f80ed";
+                createEmojiFeedback(praise.emoji, "#2f80ed");
+                
+                // Speak the word again to reinforce learning
+                setTimeout(() => {
+                    speakWord("Yes! " + currentWord);
+                }, 300);
+                
+                if (correctInRow >= 5) {
+                    levelUp();
+                } else {
+                    updateScoreDisplay();
+                    // Move to next word after correct answer (faster transition)
+                    setTimeout(() => {
+                        currentIndex++;
+                        loadWord();
+                    }, 800);
+                }
+            } else {
+                // Wrong answer
+                wrongSound.currentTime = 0;
+                wrongSound.play().catch(e => console.log("Wrong sound error:", e));
+                
+                correctInRow = 0;
+                resultDisplay.textContent = "Almost! Try again! " + ["🤔", "😅", "🙈"][Math.floor(Math.random()*3)];
+                resultDisplay.style.color = "#ff6b6b";
+                createEmojiFeedback("❌", "#ff6b6b");
+                
+                // Speak the correct word to help learning
+                setTimeout(() => {
+                    speakWord("Try saying: " + currentWord);
+                }, 300);
+            }
+            
+            progressBar.style.width = `${(correctInRow / 5) * 100}%`;
+            updateStars();
+        }
+        
+        // Create floating emoji feedback
+        function createEmojiFeedback(text, color, isAnimal = false) {
+            const emoji = document.createElement('div');
+            emoji.className = 'emoji-feedback';
+            emoji.textContent = text;
+            emoji.style.color = color;
+            emoji.style.left = Math.random() * 70 + 15 + '%';
+            emoji.style.top = isAnimal ? '20%' : '60%';
+            emoji.style.fontSize = isAnimal ? '4em' : '3em';
+            emoji.style.animationDuration = isAnimal ? '2s' : '1.5s';
+            
+            document.querySelector('.game-container').appendChild(emoji);
+            
+            setTimeout(() => {
+                emoji.style.opacity = '1';
+                setTimeout(() => {
+                    emoji.remove();
+                }, isAnimal ? 2000 : 1500);
+            }, 10);
+        }
+        
+        // Get random praise with emoji
+        function getRandomPraise() {
+            const praises = [
+                {text: "Awesome! 🎉", emoji: "🎉"},
+                {text: "Perfect! 👏", emoji: "👏"},
+                {text: "You're a star! ⭐", emoji: "⭐"},
+                {text: "Fantastic! 🚀", emoji: "🚀"},
+                {text: "Brilliant! ✨", emoji: "✨"},
+                {text: "Terrific! 🌟", emoji: "🌟"},
+                {text: "Wonderful! 😊", emoji: "😊"},
+                {text: "Amazing! 🤩", emoji: "🤩"}
+            ];
+            return praises[Math.floor(Math.random() * praises.length)];
+        }
+        
+        // Level up
+        function levelUp() {
+            if (level < wordsByLevel.length) {
+                level++;
+                correctInRow = 0;
+                
+                winSound.currentTime = 0;
+                winSound.play().catch(e => console.log("Win sound error:", e));
+                
+                createConfetti();
+                celebrationElement.style.display = 'flex';
+                document.querySelector('.celebration h2').textContent = `Level ${level} Unlocked! 🎉`;
+                
+                updateScoreDisplay();
+                document.querySelector('.level-display').textContent = `Level: ${level}`;
+                progressBar.style.width = "0%";
+                updateStars();
+                
+                // Load new level words
+                setTimeout(() => {
+                    loadLevel();
+                }, 1500);
+            } else {
+                resultDisplay.textContent = "You're a champion! 🏆 All levels complete!";
+                resultDisplay.style.color = "#ff6b6b";
+            }
+        }
+        
+        // Go to next word
+        function nextWord() {
+            celebrationElement.style.display = 'none';
+            currentIndex++;
+            loadWord();
+        }
+        
+        // Update score display
+        function updateScoreDisplay() {
+            document.querySelector('.score-display').textContent = `Score: ${score}`;
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#ff8e8e', '#56ccf2', '#2f80ed', '#ffcc5c', '#a18cd1'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.animationDuration = Math.random() * 2 + 1 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+        
+        // Shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Start the game when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // Enable audio after first user interaction
+            document.addEventListener('click', () => {
+                correctSound.play().catch(e => console.log("Audio play prevented:", e));
+            }, { once: true });
+            
+            // Wait for voices to load
+            speechSynthesis.onvoiceschanged = initGame;
+            initGame();
+        });
+    </script>
+</body>
+</html>

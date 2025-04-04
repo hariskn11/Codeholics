@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn with Fun - Complete Signup</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(to right, indigo, violet);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .logo-text .the-new {
+            display: block;
+            font-size: 16px;
+        }
+
+        .sign-in-btn {
+            background-color: #f7a91c;
+            color: white;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .sign-in-btn:hover {
+            background-color: #e69800;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        /* Signup Form */
+        .signup-form-container {
+            width: 45%;
+            max-width: 400px;
+        }
+
+        .signup-form {
+            background-color: transparent;
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .signup-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 0;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-bottom-color: #8257e6;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:invalid {
+            border-bottom-color: #ff6b6b;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .signup-btn {
+            background-color: #8257e6;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .signup-btn:hover {
+            background-color: #6b48c9;
+        }
+
+        .signup-btn:disabled {
+            background-color: #5a4a7a;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Radio button styles */
+        .radio-group {
+            margin: 20px 0;
+        }
+
+        .radio-label {
+            display: block;
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        .radio-input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 16px;
+            width: 16px;
+            background-color: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .radio-label:hover .radio-input ~ .checkmark {
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .radio-input:checked ~ .checkmark {
+            background-color: #8257e6;
+            border-color: #8257e6;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .radio-input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .radio-label .checkmark:after {
+            left: 4px;
+            top: 0px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .radio-error {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Student Images Section */
+        .student-images {
+            width: 50%;
+            display: flex;
+            position: relative;
+        }
+
+        .image-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 15px;
+            height: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .student-card {
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .student-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tall-card {
+            grid-row: span 2;
+        }
+
+        .purple-bg {
+            background-color: #8257e6;
+        }
+
+        .orange-bg {
+            background-color: #ff7a00;
+        }
+
+        .yellow-bg {
+            background-color: #ffd60a;
+        }
+
+        .pink-bg {
+            background-color: #ff0099;
+        }
+
+        .green-bg {
+            background-color: #4caf50;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .circle-1 {
+            width: 25px;
+            height: 25px;
+            background-color: #8257e6;
+            top: 20px;
+            right: 200px;
+        }
+
+        .circle-2 {
+            width: 15px;
+            height: 15px;
+            background-color: #4caf50;
+            bottom: 120px;
+            right: 30px;
+        }
+
+        .circle-3 {
+            width: 20px;
+            height: 20px;
+            background-color: #ffd60a;
+            bottom: 200px;
+            left: 190px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg class="logo-img" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 32C12 22.059 20.059 14 30 14C39.941 14 48 22.059 48 32" stroke="white" stroke-width="2"/>
+                    <path d="M31.5 25L31.5 35" stroke="white" stroke-width="2"/>
+                    <path d="M26.5 30L36.5 30" stroke="white" stroke-width="2"/>
+                    <path d="M20 40L40 40" stroke="white" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="the-new">Learn With</span>
+                    Fun
+                </div>
+            </div>
+            <a href="/login.html"><button class="sign-in-btn">Sign In</button></a>
+        </header>
+        
+        <div class="main-content">
+            <div class="signup-form-container">
+                <form id="signupForm" class="signup-form">
+                    <h1 class="signup-title">Complete Your Signup</h1>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Standard</label>
+                        <input type="text" class="form-input" id="standard" placeholder="Enter your standard" required>
+                        <div class="error-message" id="standardError">Standard is required</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">School Name</label>
+                        <input type="text" class="form-input" id="schoolName" placeholder="Enter your school name" required>
+                        <div class="error-message" id="schoolNameError">School name is required</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" class="form-input" id="dob" required>
+                        <div class="error-message" id="dobError">Date of birth is required</div>
+                    </div>
+
+                    <div class="radio-group">
+                        <label class="form-label">Select Your Medium</label>
+                        <label class="radio-label">
+                            English
+                            <input type="radio" name="medium" value="English" class="radio-input" required>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="radio-label">
+                            Tamil
+                            <input type="radio" name="medium" value="Tamil" class="radio-input">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="radio-label">
+                            Other
+                            <input type="radio" name="medium" value="Other" class="radio-input">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="radio-error" id="mediumError">Please select a medium</div>
+                    </div>
+                    
+                    <button type="submit" class="signup-btn" id="submitBtn">Complete Signup</button>
+                </form>
+            </div>
+            
+            <div class="student-images">
+                <div class="image-container">
+                    <div class="student-card tall-card purple-bg">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="Professional woman with glasses smiling">
+                    </div>
+                    <div class="student-card orange-bg">
+                        <img src="https://images.unsplash.com/photo-1629872430082-93d8912beccf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Student in uniform reading a book">
+                    </div>
+                    <div class="student-card yellow-bg">
+                        <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Woman with hijab and glasses">
+                    </div>
+                    <div class="student-card pink-bg">
+                        <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Graduate student with cap and gown">
+                    </div>
+                    <div class="student-card green-bg">
+                        <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Female student smiling">
+                    </div>
+                    <div class="circle circle-1"></div>
+                    <div class="circle circle-2"></div>
+                    <div class="circle circle-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const standardInput = document.getElementById('standard');
+            const schoolNameInput = document.getElementById('schoolName');
+            const dobInput = document.getElementById('dob');
+            const mediumInputs = document.querySelectorAll('input[name="medium"]');
+            const submitBtn = document.getElementById('submitBtn');
+            const standardError = document.getElementById('standardError');
+            const schoolNameError = document.getElementById('schoolNameError');
+            const dobError = document.getElementById('dobError');
+            const mediumError = document.getElementById('mediumError');
+
+            // Check if user came from signup step 1
+            const userId = localStorage.getItem('tempUserId');
+            if (!userId) {
+                alert('Please complete the first step of signup first');
+                window.location.href = '/signup.html';
+            }
+
+            // Real-time validation
+            standardInput.addEventListener('input', () => {
+                standardError.style.display = standardInput.value.trim() ? 'none' : 'block';
+            });
+
+            schoolNameInput.addEventListener('input', () => {
+                schoolNameError.style.display = schoolNameInput.value.trim() ? 'none' : 'block';
+            });
+
+            dobInput.addEventListener('input', () => {
+                dobError.style.display = dobInput.value ? 'none' : 'block';
+            });
+
+            mediumInputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    mediumError.style.display = 'none';
+                });
+            });
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const standard = standardInput.value.trim();
+                const school_name = schoolNameInput.value.trim();
+                const dob = dobInput.value;
+                const medium = document.querySelector('input[name="medium"]:checked')?.value;
+
+                // Client-side validation
+                if (!standard) {
+                    standardError.style.display = 'block';
+                    return;
+                }
+                if (!school_name) {
+                    schoolNameError.style.display = 'block';
+                    return;
+                }
+                if (!dob) {
+                    dobError.style.display = 'block';
+                    return;
+                }
+                if (!medium) {
+                    mediumError.style.display = 'block';
+                    return;
+                }
+
+                const formData = {
+                    userId,
+                    standard,
+                    school_name,
+                    dob,
+                    medium
+                };
+
+                try {
+                    submitBtn.disabled = true;
+                    const response = await fetch('/api/signup/details', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        localStorage.removeItem('tempUserId');
+                        localStorage.setItem('userId', userId);
+                        alert('Signup completed successfully!');
+                        window.location.href = '/home.html';
+                    } else {
+                        alert(data.error || 'Failed to save details');
+                    }
+                } catch (error) {
+                    alert('An error occurred. Please try again.');
+                    console.error('Signup details error:', error);
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

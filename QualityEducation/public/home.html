@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn with Fun</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(to right, indigo, violet);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .logo-text .the-new {
+            display: block;
+            font-size: 16px;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #f7a91c;
+        }
+
+        .sign-out-btn {
+            background-color: #f7a91c;
+            color: white;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .sign-out-btn:hover {
+            background-color: #e69800;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .hero-content {
+            width: 45%;
+            padding-top: 30px;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            color: #adb5bd;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 450px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 60px;
+        }
+
+        .games-btn {
+            background-color: #0095ff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .games-btn:hover {
+            background-color: #007acc;
+        }
+
+        .profile-btn {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .profile-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .category-section {
+            margin-top: 40px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .category-btn {
+            background: none;
+            border: 1px solid #adb5bd;
+            color: #adb5bd;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background-color: #8257e6;
+            border-color: #8257e6;
+            color: white;
+        }
+
+        /* Student Images Section */
+        .student-images {
+            width: 50%;
+            display: flex;
+            position: relative;
+        }
+
+        .image-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 15px;
+            height: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .student-card {
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .student-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tall-card {
+            grid-row: span 2;
+        }
+
+        .purple-bg {
+            background-color: #8257e6;
+        }
+
+        .orange-bg {
+            background-color: #ff7a00;
+        }
+
+        .yellow-bg {
+            background-color: #ffd60a;
+        }
+
+        .pink-bg {
+            background-color: #ff0099;
+        }
+
+        .green-bg {
+            background-color: #4caf50;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .circle-1 {
+            width: 25px;
+            height: 25px;
+            background-color: #8257e6;
+            top: 20px;
+            right: 200px;
+        }
+
+        .circle-2 {
+            width: 15px;
+            height: 15px;
+            background-color: #4caf50;
+            bottom: 120px;
+            right: 30px;
+        }
+
+        .circle-3 {
+            width: 20px;
+            height: 20px;
+            background-color: #ffd60a;
+            bottom: 200px;
+            left: 190px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg class="logo-img" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 32C12 22.059 20.059 14 30 14C39.941 14 48 22.059 48 32" stroke="white" stroke-width="2"/>
+                    <path d="M31.5 25L31.5 35" stroke="white" stroke-width="2"/>
+                    <path d="M26.5 30L36.5 30" stroke="white" stroke-width="2"/>
+                    <path d="M20 40L40 40" stroke="white" stroke-width="2"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="the-new">Learn With</span>
+                    Fun
+                </div>
+            </div>
+            <nav>
+                <a href="#">About</a>
+                <a href="#">Academy</a>
+                <a href="#">Features</a>
+            </nav>
+            <button class="sign-out-btn" id="signOutBtn">Sign Out</button>
+        </header>
+        
+        <div class="hero-section">
+            <div class="hero-content">
+                <br><br><br>
+                <h1 class="hero-title" id="welcomeTitle">Welcome!</h1>
+                <p class="hero-description">Learn with fun is a platform where students can study their subjects with games.</p>
+                <div class="hero-buttons">
+                    <button class="games-btn">Games</button>
+                    <button class="profile-btn">Profile</button>
+                </div>
+            </div>
+            <div class="student-images">
+                <div class="image-container">
+                    <div class="student-card tall-card purple-bg">
+                        <img src="https://i.pinimg.com/736x/fc/b7/57/fcb757fc93ca27dd0d3edba7a0f68df4.jpg" alt="Boy smiling ">
+                    </div>
+                    <div class="student-card orange-bg">
+                        <img src="https://images.unsplash.com/photo-1629872430082-93d8912beccf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Student in uniform reading a book">
+                    </div>
+                    <div class="student-card yellow-bg">
+                        <img src="https://media.istockphoto.com/id/1392743559/photo/proud-girl-with-winner-trophy-and-medal-with-cheerfully-students-applauding-for-success-of.jpg?s=612x612&w=0&k=20&c=tgRp73NPbOpownjJKUzqXAp9zolRcxlnegdfUdPgAhw=" alt="children's achievement">
+                    </div>
+                    <div class="student-card pink-bg">
+                        <img src="https://media.licdn.com/dms/image/v2/C5612AQHkHfQlSxoW6w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1620524094197?e=2147483647&v=beta&t=kld52AMme7QJ4yu5v3ZHCWFxlW_WdRwNPBfez83iuUQ" alt="E-Learning">
+                    </div>
+                    <div class="student-card green-bg">
+                        <img src="https://static.toiimg.com/thumb/msid-94457721,width-400,resizemode-4/94457721.jpg" alt="Students with Laptop">
+                    </div>
+                    <div class="circle circle-1"></div>
+                    <div class="circle circle-2"></div>
+                    <div class="circle circle-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signOutBtn = document.getElementById('signOutBtn');
+            const welcomeTitle = document.getElementById('welcomeTitle');
+            const userId = localStorage.getItem('userId');
+            const username = localStorage.getItem('username');
+
+            // Check if user is logged in
+            if (!userId) {
+                window.location.href = '/dashboard.html';
+            } else {
+                welcomeTitle.textContent = `Welcome ${username}!`;
+            }
+
+            // Sign out functionality
+            signOutBtn.addEventListener('click', function() {
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                window.location.href = '/dashboard.html';
+            });
+
+            // Placeholder for profile button
+            document.querySelector('.profile-btn').addEventListener('click', function() {
+                // alert('Profile view not yet implemented');
+                window.location.href = '/profile.html';
+            });
+
+            // Placeholder for games button
+            document.querySelector('.games-btn').addEventListener('click', function() {
+                // alert('Games section not yet implemented');
+                window.location.href = '/games.html';
+            });
+        });
+    </script>
+</body>
+</html>

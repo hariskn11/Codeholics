@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Adventure Match</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            text-align: center;
+            min-height: 100vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: #fff;
+            text-shadow: 3px 3px 0 #ff8a00, -1px -1px 0 #e52e71;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin: 5px 0;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex-grow: 1;
+            overflow: auto;
+            width: 100%;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto;
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .info-box {
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        #timer {
+            background: linear-gradient(to right, #ff5e62, #ff9966);
+            color: white;
+        }
+
+        #score {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        #level {
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+            color: white;
+        }
+
+        #game-board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: flex-start;
+            max-width: 500px;
+            min-height: 400px;
+            margin: 10px auto;
+            padding: 10px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 20px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .card {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 8px;
+            font-size: 28px;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1),
+                        -5px -5px 15px rgba(255,255,255,0.7);
+            color: #333;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255,255,255,0.3),
+                rgba(255,255,255,0)
+            );
+            transform: rotate(30deg);
+        }
+
+        .card:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.15),
+                        -8px -8px 20px rgba(255,255,255,0.8);
+        }
+
+        .card.selected {
+            background: linear-gradient(145deg, #ffcc00, #ff9900);
+            color: white;
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card.matched {
+            background: linear-gradient(145deg, #66ff66, #00cc66);
+            color: white;
+            pointer-events: none;
+            animation: bounce 0.5s ease;
+            box-shadow: 0 0 20px rgba(0,255,0,0.5);
+        }
+
+        .card.vowel-selected {
+            background: linear-gradient(145deg, #ff9966, #ff5e62);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .card.letter-pair {
+            background: linear-gradient(145deg, #a18cd1, #fbc2eb);
+            color: white;
+        }
+
+        .card.word {
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .card.number {
+            background: linear-gradient(145deg, #ff9966, #ff5e62);
+            color: white;
+        }
+
+        .card.animal {
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            color: white;
+            font-size: 14px;  /* Reduced from default */
+            padding: 5px;     /* Added padding */
+            word-break: break-word; /* Ensure text wraps */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2; /* Better line spacing */
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .character {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .character:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .restart-btn {
+            background: linear-gradient(to right, #ff5e62, #ff9966);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .restart-btn:active {
+            transform: translateY(1px);
+        }
+
+        .next-level-btn {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .next-level-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .next-level-btn:active {
+            transform: translateY(1px);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .celebration h2 {
+            font-size: 3em;
+            color: #ff5e62;
+            text-shadow: 3px 3px 0 #ffcc00;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite alternate;
+        }
+
+        .celebration h3 {
+            font-size: 2em;
+            color: #4facfe;
+            margin-bottom: 30px;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .instructions {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 10px auto;
+            max-width: 500px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        @media (max-height: 700px) {
+            .card {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+                margin: 6px;
+            }
+            
+            .card.word {
+                font-size: 14px;
+            }
+            
+            #game-board {
+                min-height: 350px;
+            }
+
+            .card.animal {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .card {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                margin: 5px;
+            }
+            
+            .card.word {
+                font-size: 12px;
+            }
+            
+            #game-board {
+                min-height: 300px;
+            }
+
+            .card.animal {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Alphabet Adventure Match</h1>
+        <div class="subtitle">Level <span id="level-display">1</span>: <span id="level-description">Match Uppercase & Lowercase Letters!</span></div>
+    </div>
+
+    <div class="game-container">
+        <div class="game-info">
+            <div class="info-box" id="timer">⏱️ Time: 60s</div>
+            <div class="info-box" id="score">⭐ Progress: 0/8</div>
+            <div class="info-box" id="level">Level: 1</div>
+        </div>
+
+        <div class="instructions" id="instructions">
+            Click on matching uppercase and lowercase letters!
+        </div>
+
+        <div id="game-board"></div>
+
+        <div class="button-container">
+            <button class="restart-btn" onclick="initGame()">🔁 Restart</button>
+            <button class="next-level-btn" id="next-level-btn" onclick="nextLevel()" style="display: none;">➡️ Next Level</button>
+        </div>
+    </div>
+
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjI1MCIgZmlsbD0iI2ZmYzEwNyIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjAwIiBmaWxsPSIjZmZmZmZmIi8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMTgwIiByPSIzMCIgZmlsbD0iIzAwMDAwMCIvPjxjaXJjbGUgY3g9IjMzMCIgY3k9IjE4MCIgcj0iMzAiIGZpbGw9IiMwMDAwMDAiLz48cGF0aCBkPSJNMTgwLDMzMCBRMjU2LDQwMCAzMzAsMzMwIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMTAiIGZpbGw9Im5vbmUiLz48L3N2Zz4=" 
+         class="character" alt="Happy face" title="Great job!">
+
+    <div class="celebration" id="celebration">
+        <h2 id="celebration-message">You Win! 🎉</h2>
+        <h3 id="level-complete-message"></h3>
+        <div class="button-container">
+            <button class="restart-btn" onclick="initGame()">🔁 Play Again</button>
+            <button class="next-level-btn" id="final-next-level-btn" onclick="nextLevel()">➡️ Next Level</button>
+        </div>
+    </div>
+
+    <script>
+        // Game elements
+        const gameBoard = document.getElementById('game-board');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const celebration = document.getElementById('celebration');
+        const celebrationMessage = document.getElementById('celebration-message');
+        const levelCompleteMessage = document.getElementById('level-complete-message');
+        const instructions = document.getElementById('instructions');
+        const levelDescription = document.getElementById('level-description');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const finalNextLevelBtn = document.getElementById('final-next-level-btn');
+        
+        // Game variables
+        let selectedCards = [];
+        let matchedPairs = 0;
+        let timeLeft = 60;
+        let timer;
+        let gameActive = false;
+        let currentLevel = 1;
+        let totalPairs = 8; // 8 pairs (16 cards)
+        let vowelsFound = 0;
+        const totalVowels = 5; // A, E, I, O, U
+        let letterPairsFound = 0;
+        let numbersFound = 0;
+        let animalsFound = 0;
+        
+        // Full alphabet
+        const fullAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const vowels = ['A', 'E', 'I', 'O', 'U'];
+        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const animals = ['Lion', 'Tiger', 'Bear', 'Wolf', 'Zebra', 'Giraffe', 'Monkey', 'Elephant', 'Kangaroo', 'Penguin'];
+        
+        // Initialize the game
+        function initGame() {
+            // Reset game state
+            gameBoard.innerHTML = '';
+            selectedCards = [];
+            matchedPairs = 0;
+            vowelsFound = 0;
+            letterPairsFound = 0;
+            numbersFound = 0;
+            animalsFound = 0;
+            timeLeft = 60;
+            gameActive = true;
+            
+            // Update displays
+            updateScoreDisplay();
+            timerDisplay.textContent = `⏱️ Time: ${timeLeft}s`;
+            levelDisplay.textContent = `Level: ${currentLevel}`;
+            document.getElementById('level-display').textContent = currentLevel;
+            
+            // Hide celebration
+            celebration.style.display = 'none';
+            nextLevelBtn.style.display = 'none';
+            
+            // Set level-specific instructions
+            if (currentLevel === 1) {
+                levelDescription.textContent = "Match Uppercase & Lowercase Letters!";
+                instructions.textContent = "Click on matching uppercase and lowercase letters!";
+                initLevel1();
+            } else if (currentLevel === 2) {
+                levelDescription.textContent = "Find All the Vowels!";
+                instructions.textContent = "Click on all the vowels (A, E, I, O, U)!";
+                initLevel2();
+            } else if (currentLevel === 3) {
+                levelDescription.textContent = "Match Letters to Words!";
+                instructions.textContent = "Click on a letter and then a word that starts with that letter!";
+                initLevel3();
+            } else if (currentLevel === 4) {
+                levelDescription.textContent = "Match Numbers to Words!";
+                instructions.textContent = "Click on a number and then the matching word (e.g., 1 and 'one')!";
+                initLevel4();
+            } else if (currentLevel === 5) {
+                levelDescription.textContent = "Match Animals to Letters!";
+                instructions.textContent = "Click on an animal and then the letter it starts with!";
+                initLevel5();
+            }
+            
+            // Start timer
+            clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+        }
+        
+        // Initialize Level 1 (letter matching)
+        function initLevel1() {
+            // Get 8 random letters
+            const randomLetters = getRandomLetters();
+            
+            // Create pairs (uppercase and lowercase)
+            let cards = [];
+            randomLetters.forEach(letter => {
+                cards.push(letter); // Uppercase
+                cards.push(letter.toLowerCase()); // Lowercase
+            });
+            
+            // Shuffle the cards
+            cards = shuffleArray(cards);
+            
+            // Create card elements
+            cards.forEach((letter, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = letter;
+                card.dataset.value = letter.toLowerCase(); // For matching
+                card.addEventListener('click', () => flipCard(card));
+                gameBoard.appendChild(card);
+            });
+        }
+        
+        // Initialize Level 2 (vowel selection)
+        function initLevel2() {
+            // Create a mix of vowels and consonants
+            let cards = [];
+            
+            // Add all vowels (2 of each)
+            vowels.forEach(vowel => {
+                cards.push(vowel);
+                cards.push(vowel.toLowerCase());
+            });
+            
+            // Add random consonants to fill the board
+            const consonants = 'BCDFGHJKLMNPQRSTVWXYZ'.split('');
+            for (let i = 0; i < 6; i++) {
+                const consonant = consonants[Math.floor(Math.random() * consonants.length)];
+                cards.push(consonant);
+                cards.push(consonant.toLowerCase());
+            }
+            
+            // Shuffle the cards
+            cards = shuffleArray(cards);
+            
+            // Create card elements
+            cards.forEach((letter, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = letter;
+                card.dataset.value = letter.toLowerCase();
+                card.dataset.isVowel = vowels.includes(letter.toUpperCase()) ? 'true' : 'false';
+                card.addEventListener('click', () => selectVowel(card));
+                gameBoard.appendChild(card);
+            });
+        }
+        
+        // Initialize Level 3 (letter to word matching)
+        function initLevel3() {
+            // Create letter-word pairs
+            const wordPairs = [
+                { letter: 'A', word: 'Apple' },
+                { letter: 'B', word: 'Ball' },
+                { letter: 'C', word: 'Cat' },
+                { letter: 'D', word: 'Dog' },
+                { letter: 'E', word: 'Egg' },
+                { letter: 'F', word: 'Fish' },
+                { letter: 'G', word: 'Goat' },
+                { letter: 'H', word: 'Hat' }
+            ];
+            
+            // Shuffle the pairs
+            const shuffledPairs = shuffleArray([...wordPairs]);
+            
+            // Create cards for letters and words
+            let cards = [];
+            shuffledPairs.forEach(pair => {
+                // Add letter card
+                cards.push({
+                    type: 'letter',
+                    value: pair.letter,
+                    pairValue: pair.word
+                });
+                
+                // Add word card
+                cards.push({
+                    type: 'word',
+                    value: pair.word,
+                    pairValue: pair.letter,
+                    class: 'word'
+                });
+            });
+            
+            // Shuffle all cards
+            cards = shuffleArray(cards);
+            
+            // Create card elements
+            cards.forEach(cardData => {
+                const card = document.createElement('div');
+                card.className = 'card ' + (cardData.class || '');
+                card.textContent = cardData.value;
+                card.dataset.type = cardData.type;
+                card.dataset.value = cardData.value;
+                card.dataset.pairValue = cardData.pairValue;
+                card.addEventListener('click', () => selectLetterPair(card));
+                gameBoard.appendChild(card);
+            });
+        }
+        
+        // Initialize Level 4 (number to word matching)
+        function initLevel4() {
+            // Create number-word pairs
+            const numberWords = [
+                { number: 1, word: 'one' },
+                { number: 2, word: 'two' },
+                { number: 3, word: 'three' },
+                { number: 4, word: 'four' },
+                { number: 5, word: 'five' },
+                { number: 6, word: 'six' },
+                { number: 7, word: 'seven' },
+                { number: 8, word: 'eight' }
+            ];
+            
+            // Shuffle the pairs
+            const shuffledPairs = shuffleArray([...numberWords]);
+            
+            // Create cards for numbers and words
+            let cards = [];
+            shuffledPairs.forEach(pair => {
+                // Add number card
+                cards.push({
+                    type: 'number',
+                    value: pair.number,
+                    pairValue: pair.word,
+                    class: 'number'
+                });
+                
+                // Add word card
+                cards.push({
+                    type: 'word',
+                    value: pair.word,
+                    pairValue: pair.number,
+                    class: 'word'
+                });
+            });
+            
+            // Shuffle all cards
+            cards = shuffleArray(cards);
+            
+            // Create card elements
+            cards.forEach(cardData => {
+                const card = document.createElement('div');
+                card.className = 'card ' + (cardData.class || '');
+                card.textContent = cardData.value;
+                card.dataset.type = cardData.type;
+                card.dataset.value = cardData.value;
+                card.dataset.pairValue = cardData.pairValue;
+                card.addEventListener('click', () => selectNumberPair(card));
+                gameBoard.appendChild(card);
+            });
+        }
+        
+        // Initialize Level 5 (animal to letter matching)
+        function initLevel5() {
+            // Create animal-letter pairs with shorter display names
+            const animalPairs = [
+                { animal: 'Lion', display: 'Lion', letter: 'L' },
+                { animal: 'Tiger', display: 'Tiger', letter: 'T' },
+                { animal: 'Bear', display: 'Bear', letter: 'B' },
+                { animal: 'Wolf', display: 'Wolf', letter: 'W' },
+                { animal: 'Zebra', display: 'Zebra', letter: 'Z' },
+                { animal: 'Giraffe', display: 'Giraffe', letter: 'G' },
+                { animal: 'Monkey', display: 'Monkey', letter: 'M' },
+                { animal: 'Elephant', display: 'Eleph.', letter: 'E' } // Shortened
+            ];
+
+            // Shuffle the pairs
+            const shuffledPairs = shuffleArray([...animalPairs]);
+            
+            // Create cards for animals and letters
+            let cards = [];
+            shuffledPairs.forEach(pair => {
+                // Add animal card
+                cards.push({
+                    type: 'animal',
+                    value: pair.animal,
+                    displayValue: pair.display, // Use shortened display name
+                    pairValue: pair.letter,
+                    class: 'animal'
+                });
+                
+                // Add letter card
+                cards.push({
+                    type: 'letter',
+                    value: pair.letter,
+                    pairValue: pair.animal,
+                    class: 'letter-pair'
+                });
+            });
+            
+            // Shuffle all cards
+            cards = shuffleArray(cards);
+            
+            // Create card elements
+            cards.forEach(cardData => {
+                const card = document.createElement('div');
+                card.className = 'card ' + (cardData.class || '');
+                card.textContent = cardData.displayValue || cardData.value; // Use display value if available
+                card.dataset.type = cardData.type;
+                card.dataset.value = cardData.value;
+                card.dataset.pairValue = cardData.pairValue;
+                card.addEventListener('click', () => selectAnimalPair(card));
+                gameBoard.appendChild(card);
+            });
+        }
+        
+        // Function to get random letters
+        function getRandomLetters() {
+            // Shuffle the full alphabet
+            const shuffled = [...fullAlphabet].sort(() => 0.5 - Math.random());
+            // Take first 8 letters
+            return shuffled.slice(0, 8);
+        }
+        
+        // Shuffle array function
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Flip a card (for Level 1)
+        function flipCard(card) {
+            if (!gameActive || card.classList.contains('selected') || card.classList.contains('matched')) {
+                return;
+            }
+            
+            // Show the card
+            card.classList.add('selected');
+            selectedCards.push(card);
+            
+            // If two cards are selected, check for a match
+            if (selectedCards.length === 2) {
+                checkForMatch();
+            }
+        }
+        
+        // Select a vowel (for Level 2)
+        function selectVowel(card) {
+            if (!gameActive || card.classList.contains('vowel-selected')) {
+                return;
+            }
+            
+            // Check if it's a vowel
+            if (card.dataset.isVowel === 'true') {
+                card.classList.add('vowel-selected');
+                vowelsFound++;
+                updateScoreDisplay();
+                
+                // Check if all vowels found
+                if (vowelsFound === totalVowels * 2) { // 2 of each vowel
+                    winGame();
+                }
+            }
+        }
+        
+        // Select letter-word pair (for Level 3)
+        function selectLetterPair(card) {
+            if (!gameActive || card.classList.contains('matched')) {
+                return;
+            }
+            
+            // If no card is selected yet
+            if (selectedCards.length === 0) {
+                // Only allow letters to be selected first
+                if (card.dataset.type === 'letter') {
+                    card.classList.add('selected');
+                    selectedCards.push(card);
+                }
+            } 
+            // If one card is already selected
+            else if (selectedCards.length === 1) {
+                const firstCard = selectedCards[0];
+                
+                // Check if we're selecting a word to match the letter
+                if (firstCard.dataset.type === 'letter' && card.dataset.type === 'word') {
+                    // Check if they match
+                    if (firstCard.dataset.pairValue === card.dataset.value) {
+                        // Match found
+                        firstCard.classList.remove('selected');
+                        firstCard.classList.add('matched');
+                        card.classList.add('matched');
+                        
+                        letterPairsFound++;
+                        updateScoreDisplay();
+                        
+                        // Check for win
+                        if (letterPairsFound === totalPairs) {
+                            winGame();
+                        }
+                    } else {
+                        // No match
+                        setTimeout(() => {
+                            firstCard.classList.remove('selected');
+                        }, 1000);
+                    }
+                    selectedCards = [];
+                }
+            }
+        }
+        
+        // Select number-word pair (for Level 4)
+        function selectNumberPair(card) {
+            if (!gameActive || card.classList.contains('matched')) {
+                return;
+            }
+            
+            // If no card is selected yet
+            if (selectedCards.length === 0) {
+                // Only allow numbers to be selected first
+                if (card.dataset.type === 'number') {
+                    card.classList.add('selected');
+                    selectedCards.push(card);
+                }
+            } 
+            // If one card is already selected
+            else if (selectedCards.length === 1) {
+                const firstCard = selectedCards[0];
+                
+                // Check if we're selecting a word to match the number
+                if (firstCard.dataset.type === 'number' && card.dataset.type === 'word') {
+                    // Check if they match
+                    if (firstCard.dataset.pairValue === card.dataset.value) {
+                        // Match found
+                        firstCard.classList.remove('selected');
+                        firstCard.classList.add('matched');
+                        card.classList.add('matched');
+                        
+                        numbersFound++;
+                        updateScoreDisplay();
+                        
+                        // Check for win
+                        if (numbersFound === totalPairs) {
+                            winGame();
+                        }
+                    } else {
+                        // No match
+                        setTimeout(() => {
+                            firstCard.classList.remove('selected');
+                        }, 1000);
+                    }
+                    selectedCards = [];
+                }
+            }
+        }
+        
+        // Select animal-letter pair (for Level 5)
+        function selectAnimalPair(card) {
+            if (!gameActive || card.classList.contains('matched')) {
+                return;
+            }
+            
+            // If no card is selected yet
+            if (selectedCards.length === 0) {
+                // Only allow animals to be selected first
+                if (card.dataset.type === 'animal') {
+                    card.classList.add('selected');
+                    selectedCards.push(card);
+                }
+            } 
+            // If one card is already selected
+            else if (selectedCards.length === 1) {
+                const firstCard = selectedCards[0];
+                
+                // Check if we're selecting a letter to match the animal
+                if (firstCard.dataset.type === 'animal' && card.dataset.type === 'letter') {
+                    // Check if they match
+                    if (firstCard.dataset.pairValue === card.dataset.value) {
+                        // Match found
+                        firstCard.classList.remove('selected');
+                        firstCard.classList.add('matched');
+                        card.classList.add('matched');
+                        
+                        animalsFound++;
+                        updateScoreDisplay();
+                        
+                        // Check for win
+                        if (animalsFound === totalPairs) {
+                            winGame();
+                        }
+                    } else {
+                        // No match
+                        setTimeout(() => {
+                            firstCard.classList.remove('selected');
+                        }, 1000);
+                    }
+                    selectedCards = [];
+                }
+            }
+        }
+        
+        // Check if the selected cards match (Level 1)
+        function checkForMatch() {
+            const [card1, card2] = selectedCards;
+            
+            if (card1.dataset.value === card2.dataset.value) {
+                // Match found
+                card1.classList.remove('selected');
+                card2.classList.remove('selected');
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                
+                matchedPairs++;
+                updateScoreDisplay();
+                
+                // Check for win
+                if (matchedPairs === totalPairs) {
+                    winGame();
+                }
+            } else {
+                // No match
+                setTimeout(() => {
+                    card1.classList.remove('selected');
+                    card2.classList.remove('selected');
+                }, 1000);
+            }
+            
+            selectedCards = [];
+        }
+        
+        // Update the score display
+        function updateScoreDisplay() {
+            if (currentLevel === 1) {
+                scoreDisplay.textContent = `⭐ Matches: ${matchedPairs}/${totalPairs}`;
+            } else if (currentLevel === 2) {
+                scoreDisplay.textContent = `⭐ Vowels: ${vowelsFound}/${totalVowels * 2}`;
+            } else if (currentLevel === 3) {
+                scoreDisplay.textContent = `⭐ Pairs: ${letterPairsFound}/${totalPairs}`;
+            } else if (currentLevel === 4) {
+                scoreDisplay.textContent = `⭐ Pairs: ${numbersFound}/${totalPairs}`;
+            } else if (currentLevel === 5) {
+                scoreDisplay.textContent = `⭐ Pairs: ${animalsFound}/${totalPairs}`;
+            }
+        }
+        
+        // Update the timer
+        function updateTimer() {
+            timeLeft--;
+            timerDisplay.textContent = `⏱️ Time: ${timeLeft}s`;
+            
+            if (timeLeft <= 0) {
+                endGame(false);
+            }
+        }
+        
+        // Win the game
+        function winGame() {
+            endGame(true);
+            createConfetti();
+            
+            if (currentLevel === 1) {
+                celebrationMessage.textContent = "Level Complete! 🎉";
+                levelCompleteMessage.textContent = "Great job matching letters!";
+            } else if (currentLevel === 2) {
+                celebrationMessage.textContent = "Level Complete! 🎉";
+                levelCompleteMessage.textContent = "You found all the vowels!";
+            } else if (currentLevel === 3) {
+                celebrationMessage.textContent = "Level Complete! 🎉";
+                levelCompleteMessage.textContent = "Awesome word matching!";
+            } else if (currentLevel === 4) {
+                celebrationMessage.textContent = "Level Complete! 🎉";
+                levelCompleteMessage.textContent = "Excellent number skills!";
+            } else if (currentLevel === 5) {
+                celebrationMessage.textContent = "Congratulations! 🏆";
+                levelCompleteMessage.textContent = "You've completed all levels!";
+                finalNextLevelBtn.style.display = 'none';
+            }
+            
+            celebration.style.display = 'flex';
+            
+            // Show next level button if not on last level
+            if (currentLevel < 5) {
+                finalNextLevelBtn.style.display = 'inline-block';
+            } else {
+                finalNextLevelBtn.style.display = 'none';
+            }
+        }
+        
+        // End the game
+        function endGame(win) {
+            gameActive = false;
+            clearInterval(timer);
+            
+            if (!win) {
+                // Show all cards when time runs out
+                if (currentLevel === 1) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        card.classList.add('selected');
+                    });
+                } else if (currentLevel === 2) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        if (card.dataset.isVowel === 'true') {
+                            card.classList.add('vowel-selected');
+                        }
+                    });
+                } else if (currentLevel === 3) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        if (card.dataset.type === 'letter') {
+                            card.classList.add('selected');
+                        }
+                    });
+                } else if (currentLevel === 4) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        if (card.dataset.type === 'number') {
+                            card.classList.add('selected');
+                        }
+                    });
+                } else if (currentLevel === 5) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        if (card.dataset.type === 'animal') {
+                            card.classList.add('selected');
+                        }
+                    });
+                }
+            }
+        }
+        
+        // Move to next level
+        function nextLevel() {
+            currentLevel++;
+            celebration.style.display = 'none';
+            initGame();
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff5e62', '#ff9966', '#4facfe', '#00f2fe', '#a18cd1', '#fbc2eb', '#ffcc00', '#66ff66'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Start the game when the page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

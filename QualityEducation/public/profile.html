@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learn with Fun - Profile</title>
     <style>
-        /* Your existing CSS remains unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -186,6 +185,129 @@
             height: 60px;
             margin-right: 10px;
         }
+
+        /* Guidance Styles */
+        .guidance-highlight {
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(247, 169, 28, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(247, 169, 28, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 169, 28, 0); }
+        }
+
+        .guidance-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 15px solid white;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+
+        /* UPDATED AI TUTOR STYLES TO MATCH THE FIRST EXAMPLE */
+        .guide-bot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #56ccf2, #2f80ed);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        .guide-bot:hover {
+            transform: scale(1.1);
+        }
+
+        .guide-bot-icon {
+            font-size: 40px;
+            color: white;
+        }
+
+        .guide-message {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            max-width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10;
+            border: 3px solid #56ccf2;
+            animation: bounceIn 0.3s ease;
+            color: #333;
+        }
+
+        .guide-message:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+        }
+
+        .guide-message-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .guide-message-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .guide-message button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            min-width: auto;
+            margin: 0 5px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-message button.close-btn {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+        }
+
+        .guide-message button.repeat-btn {
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -250,13 +372,30 @@
                 <!-- Scores will be dynamically inserted here -->
             </div>
             
-            <button class="visualization-btn">Visualization</button>
+            <button class="visualization-btn" id="visualizationBtn">Visualization</button>
         </div>
     </div>
+
+    <!-- UPDATED AI TUTOR SECTION TO MATCH FIRST EXAMPLE -->
+    <div class="guide-bot" id="guide-bot">
+        <div class="guide-bot-icon">🤖</div>
+    </div>
+    
+    <div class="guide-message" id="guide-message">
+        <div class="guide-message-text" id="guide-message-text">Welcome to your profile! I'm your learning guide!</div>
+        <div class="guide-message-buttons">
+            <button class="repeat-btn" id="repeat-btn">🔊 Repeat</button>
+            <button class="close-btn" id="close-btn">Close</button>
+        </div>
+    </div>
+
+    <audio id="guideSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3" preload="auto"></audio>
+    <audio id="popSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             const userId = localStorage.getItem('userId');
+            const username = localStorage.getItem('username');
             console.log('Retrieved userId from localStorage:', userId);
 
             if (!userId) {
@@ -266,9 +405,206 @@
                 return;
             }
 
+            // Guide Bot Elements
+            const guideBot = document.getElementById('guide-bot');
+            const guideMessage = document.getElementById('guide-message');
+            const guideMessageText = document.getElementById('guide-message-text');
+            const repeatBtn = document.getElementById('repeat-btn');
+            const closeBtn = document.getElementById('close-btn');
+            const guideSound = document.getElementById('guideSound');
+            const popSound = document.getElementById('popSound');
+            
+            // State variables
+            let guideUtterance = null;
+            let currentGuideMessage = "";
+            let voicesLoaded = false;
+
+            // Guide messages
+            const guideMessages = {
+                welcome: `Hello ${username || 'there'}! I'm here to help you understand your profile.`,
+                profileDetails: "This section shows your personal information and learning details.",
+                scoreboard: "Here you can see your progress in different subjects.",
+                visualization: "Click the Visualization button to see your progress in charts!",
+                dashboard: "Go back to Dashboard to continue learning with fun games!",
+                profileNav: "You're currently viewing your profile details.",
+                encouragement: "Great progress! Keep up the good work!"
+            };
+
+            // Guide Bot Functions
+            function showGuideMessage(messageKey) {
+                if (guideMessages[messageKey]) {
+                    currentGuideMessage = messageKey;
+                    guideMessageText.textContent = guideMessages[messageKey];
+                    guideMessage.style.display = 'block';
+                    speakGuideMessage(guideMessages[messageKey]);
+                }
+            }
+
+            function closeGuideMessage() {
+                guideMessage.style.display = 'none';
+                playSound(popSound);
+                cancelSpeech();
+            }
+
+            function repeatGuideMessage() {
+                if (currentGuideMessage && guideMessages[currentGuideMessage]) {
+                    speakGuideMessage(guideMessages[currentGuideMessage]);
+                }
+            }
+
+            function cancelSpeech() {
+                if (guideUtterance) {
+                    speechSynthesis.cancel();
+                }
+            }
+
+            function playSound(sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Sound error:", e));
+            }
+
+            async function speakGuideMessage(message) {
+                cancelSpeech();
+                
+                if (!voicesLoaded) {
+                    const voices = await loadVoices();
+                    voicesLoaded = true;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(message);
+                
+                // Find a kid-friendly voice
+                const voices = speechSynthesis.getVoices();
+                const friendlyVoice = voices.find(voice => 
+                    voice.name.includes('Google UK Female') || 
+                    voice.name.includes('Karen') ||
+                    voice.name.includes('Samantha') ||
+                    voice.lang.includes('en-US')
+                );
+                
+                if (friendlyVoice) {
+                    utterance.voice = friendlyVoice;
+                    utterance.pitch = 1.2;  // Higher pitch for kid-friendliness
+                    utterance.rate = 0.9;   // Slightly slower speed
+                }
+                
+                guideUtterance = utterance;
+                speechSynthesis.speak(utterance);
+                playSound(guideSound);
+            }
+
+            function loadVoices() {
+                return new Promise(resolve => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length) {
+                        resolve(voices);
+                    } else {
+                        speechSynthesis.onvoiceschanged = () => {
+                            resolve(speechSynthesis.getVoices());
+                        };
+                    }
+                });
+            }
+
+            // Event Listeners
+            guideBot.addEventListener('click', function() {
+                if (guideMessage.style.display === 'block') {
+                    closeGuideMessage();
+                } else {
+                    showGuideMessage('welcome');
+                }
+            });
+
+            repeatBtn.addEventListener('click', repeatGuideMessage);
+            closeBtn.addEventListener('click', closeGuideMessage);
+
+            // Navigation help
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    const text = this.textContent.trim().toLowerCase();
+                    if (guideMessages[text]) {
+                        setTimeout(() => {
+                            showGuideMessage(text);
+                        }, 500);
+                    }
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    setTimeout(() => {
+                        if (!guideMessage.matches(':hover') && !guideBot.matches(':hover')) {
+                            closeGuideMessage();
+                        }
+                    }, 1000);
+                });
+            });
+
+            // Button help
+            document.querySelector('.dashboard-btn').addEventListener('mouseenter', function() {
+                showGuideMessage('dashboard');
+            });
+
+            document.getElementById('visualizationBtn').addEventListener('mouseenter', function() {
+                showGuideMessage('visualization');
+            });
+
+            // Guide message interactions
+            guideMessage.addEventListener('mouseleave', function() {
+                setTimeout(() => {
+                    if (!this.matches(':hover') && !guideBot.matches(':hover')) {
+                        closeGuideMessage();
+                    }
+                }, 1000);
+            });
+
+            // Initialize voices on first interaction
+            document.body.addEventListener('click', function initVoices() {
+                loadVoices();
+                document.body.removeEventListener('click', initVoices);
+            }, { once: true });
+
+            // Show initial guide message
+            setTimeout(() => {
+                showGuideMessage('welcome');
+            }, 1500);
+
+            // Function to fetch scores data from the server
+            async function fetchScores(userId) {
+                try {
+                    const response = await fetch(`/api/scores`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch scores');
+                    }
+                    const data = await response.json();
+                    
+                    // Find the user's scores
+                    const userScores = data.find(user => user.user_id == userId);
+                    if (!userScores) {
+                        console.log('No scores found for user');
+                        return null;
+                    }
+                    
+                    return userScores;
+                } catch (error) {
+                    console.error('Error fetching scores:', error);
+                    return null;
+                }
+            }
+
+            // Function to calculate progress percentage
+            function calculateProgress(scores) {
+                // Assuming max score per subject is 10 (as per your sample data)
+                const maxScore = 10;
+                
+                return {
+                    tamil: Math.round((scores.tamilScore / maxScore) * 100),
+                    english: Math.round((scores.englishScore / maxScore) * 100),
+                    maths: Math.round((scores.mathsScore / maxScore) * 100)
+                };
+            }
+
             try {
                 console.log('Fetching profile data for userId:', userId);
-                const response = await fetch('/api/profile', {
+                const profileResponse = await fetch('/api/profile', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -276,29 +612,59 @@
                     body: JSON.stringify({ userId })
                 });
 
-                console.log('Response status:', response.status);
-                const data = await response.json();
-                console.log('Response data:', data);
+                console.log('Response status:', profileResponse.status);
+                const profileData = await profileResponse.json();
+                console.log('Response data:', profileData);
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to load profile');
+                if (!profileResponse.ok) {
+                    throw new Error(profileData.error || 'Failed to load profile');
                 }
 
                 // Update profile details
-                document.getElementById('username').textContent = data.username || 'N/A';
-                document.getElementById('detail-username').textContent = data.username || 'N/A';
-                document.getElementById('detail-standard').textContent = data.standard || 'Not set';
-                document.getElementById('detail-age').textContent = data.dob ? calculateAge(data.dob) : 'Not set';
-                document.getElementById('detail-school').textContent = data.school_name || 'Not set';
-                document.getElementById('detail-medium').textContent = data.medium || 'Not set';
+                document.getElementById('username').textContent = profileData.username || 'N/A';
+                document.getElementById('detail-username').textContent = profileData.username || 'N/A';
+                document.getElementById('detail-standard').textContent = profileData.standard || 'Not set';
+                document.getElementById('detail-age').textContent = profileData.dob ? calculateAge(profileData.dob) : 'Not set';
+                document.getElementById('detail-school').textContent = profileData.school_name || 'Not set';
+                document.getElementById('detail-medium').textContent = profileData.medium || 'Not set';
 
-                // Placeholder for subject scores
-                const subjectScores = {
-                    tamil: { currentScore: 75, lastScore: 60 },
-                    english: { currentScore: 82, lastScore: 70 },
-                    mathematics: { currentScore: 65, lastScore: 68 }
-                };
-                renderSubjectScores(subjectScores);
+                // Fetch scores data
+                const scoresData = await fetchScores(userId);
+                if (scoresData) {
+                    // Calculate progress percentages
+                    const progress = calculateProgress(scoresData.history[0]); // Get latest score
+                    
+                    // For demo purposes, we'll show some improvement from last time
+                    const subjectScores = {
+                        tamil: { 
+                            currentScore: progress.tamil, 
+                            lastScore: Math.max(0, progress.tamil - 15) // Simulate improvement
+                        },
+                        english: { 
+                            currentScore: progress.english, 
+                            lastScore: Math.max(0, progress.english - 10) // Simulate improvement
+                        },
+                        mathematics: { 
+                            currentScore: progress.maths, 
+                            lastScore: Math.max(0, progress.maths - 5) // Simulate improvement
+                        }
+                    };
+                    
+                    renderSubjectScores(subjectScores);
+                } else {
+                    // Fallback to placeholder data if no scores found
+                    const subjectScores = {
+                        tamil: { currentScore: 75, lastScore: 60 },
+                        english: { currentScore: 82, lastScore: 70 },
+                        mathematics: { currentScore: 65, lastScore: 68 }
+                    };
+                    renderSubjectScores(subjectScores);
+                }
+
+                // Show encouragement after scores load
+                setTimeout(() => {
+                    showGuideMessage('encouragement');
+                }, 5000);
 
             } catch (error) {
                 console.error('Error fetching profile:', error);
@@ -325,9 +691,12 @@
             let html = '';
 
             for (const [subject, data] of Object.entries(subjects)) {
+                const subjectName = subject === 'mathematics' ? 'Maths' : 
+                                  subject.charAt(0).toUpperCase() + subject.slice(1);
+                
                 html += `
                     <div class="subject-card">
-                        <div class="subject-title">${subject.charAt(0).toUpperCase() + subject.slice(1)}</div>
+                        <div class="subject-title">${subjectName}</div>
                         <div class="progress-container">
                             <div class="progress-bar" style="width: ${data.currentScore}%"></div>
                         </div>

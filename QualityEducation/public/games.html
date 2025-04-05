@@ -126,6 +126,106 @@
         .back-btn:hover {
             background: linear-gradient(45deg, #e64a19, #ff7043);
         }
+
+        /* NEW AI TUTOR THEME (matches profile page) */
+        #ai-tutor-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        #ai-tutor {
+            width: 120px;
+            height: 120px;
+            background-color: #6c5ce7;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 3px solid white;
+        }
+        
+        #ai-tutor::before {
+            content: "AI";
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        #ai-tutor:hover {
+            transform: scale(1.05);
+            background-color: #5649c0;
+        }
+        
+        #ai-speech-bubble {
+            background-color: #2a3547;
+            padding: 15px;
+            border-radius: 20px;
+            max-width: 250px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            font-size: 16px;
+            color: white;
+            border: 1px solid #6c5ce7;
+        }
+        
+        #ai-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #2a3547 transparent transparent;
+        }
+        
+        #ai-speech-bubble.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Guidance Styles */
+        .guidance-highlight {
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(247, 169, 28, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(247, 169, 28, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 169, 28, 0); }
+        }
+
+        .guidance-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 15px solid white;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
     </style>
 </head>
 <body>
@@ -141,7 +241,6 @@
     <!-- Tamil Games -->
     <div class="container active tamil" id="tamil-games">
         <div class="game-card" onclick="startGame('CodeHolics')">CodeHolics</div>
-        <!-- Placeholder games until Tamil-specific games are provided -->
         <div class="game-card" onclick="startGame('Tamil Alphabet')">Tamil Alphabet</div>
         <div class="game-card" onclick="startGame('Word Formation')">Word Formation</div>
         <div class="game-card" onclick="startGame('Sentence Builder')">Sentence Builder</div>
@@ -171,7 +270,14 @@
 
     <button class="back-btn" onclick="window.location.href='/home.html'">Back to Home</button>
 
+    <!-- AI Tutor Section -->
+    <div id="ai-tutor-container">
+        <div id="ai-speech-bubble"></div>
+        <div id="ai-tutor"></div>
+    </div>
+
     <script>
+        // Game selection functions (unchanged)
         function showSubject(subject, button) {
             document.querySelectorAll('.subject-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -182,6 +288,9 @@
                 container.classList.remove('active');
             });
             document.getElementById(subject + '-games').classList.add('active');
+            
+            // Update tutor message
+            tutorSpeak(`Great choice! Here are some fun ${subject} games!`);
         }
 
         function startGame(gameName) {
@@ -191,7 +300,7 @@
                 // English
                 'Alphabet Matching': '/alp_matching.html',
                 'Grammar Detective': '/grammar_detective.html',
-                'Listen & Repeat': '/listern_repeat.html', // Note: Typo in your list as "listern_repeat"
+                'Listen & Repeat': '/listern_repeat.html',
                 'Phonics Sound': '/phonics_sound.html',
                 'Sentence Builder': '/sentence_builder.html',
                 'Story Rhyme': '/story_rhyme.html',
@@ -201,12 +310,16 @@
 
             const path = gamePaths[gameName];
             if (path) {
-                window.location.href = path;
+                tutorSpeak(`Starting ${gameName}! Get ready to learn!`);
+                setTimeout(() => {
+                    window.location.href = path;
+                }, 1000);
             } else {
-                alert(`Starting ${gameName}! (Game not yet implemented)`);
+                tutorSpeak(`Oops! ${gameName} isn't ready yet. Try another game!`);
             }
         }
 
+        // Floating emoji animation (unchanged)
         function createFloatingEmoji() {
             const emojis = ['⭐', '🔢', '🔤', '✍', '🎮', '📚', '🧩', '🌈'];
             const emoji = document.createElement("div");
@@ -220,11 +333,94 @@
         }
         setInterval(createFloatingEmoji, 800);
 
-        // Check if user is logged in
+        // AI Tutor functionality
+        let currentSpeech = null;
+        
+        function tutorSpeak(message, duration = 3000) {
+            const speechBubble = document.getElementById('ai-speech-bubble');
+            
+            // Cancel any ongoing speech
+            if (currentSpeech) {
+                speechSynthesis.cancel();
+                clearTimeout(currentSpeech.timeout);
+                speechBubble.classList.remove('show');
+            }
+            
+            // Update speech bubble
+            speechBubble.textContent = message;
+            speechBubble.classList.add('show');
+            
+            // Speak the message
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(message);
+                
+                // Try to find a child-friendly voice
+                const voices = speechSynthesis.getVoices();
+                const friendlyVoice = voices.find(voice => 
+                    voice.name.includes('Child') || 
+                    voice.name.includes('Kids') ||
+                    voice.name.includes('Young') ||
+                    voice.lang.includes('en-US')
+                );
+                
+                if (friendlyVoice) {
+                    utterance.voice = friendlyVoice;
+                    utterance.pitch = 1.2;  // Higher pitch for kid-friendliness
+                    utterance.rate = 0.9;   // Slightly slower speed
+                }
+                
+                speechSynthesis.speak(utterance);
+            }
+            
+            // Set timeout to hide bubble
+            currentSpeech = {
+                timeout: setTimeout(() => {
+                    speechBubble.classList.remove('show');
+                    currentSpeech = null;
+                }, duration)
+            };
+        }
+
+        // Initialize tutor guidance
+        function initTutor() {
+            // Initial welcome
+            setTimeout(() => {
+                tutorSpeak("Choose a subject to start playing!");
+            }, 1000);
+            
+            // Add hover events for game cards
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    tutorSpeak(`Click to play ${this.textContent}!`, 2000);
+                });
+            });
+            
+            // Add hover events for subject buttons
+            document.querySelectorAll('.subject-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    const subject = this.textContent.split(' ')[0];
+                    tutorSpeak(`Click to see ${subject} games!`, 2000);
+                });
+            });
+            
+            // Back button guidance
+            document.querySelector('.back-btn').addEventListener('mouseenter', function() {
+                tutorSpeak("Click to return to the home page", 2000);
+            });
+        }
+
+        // Check if user is logged in and initialize tutor
         document.addEventListener('DOMContentLoaded', function() {
             if (!localStorage.getItem('userId')) {
                 alert('Please log in to access games');
                 window.location.href = '/login.html';
+            } else {
+                // Load voices before initializing tutor
+                if (speechSynthesis.getVoices().length === 0) {
+                    speechSynthesis.onvoiceschanged = initTutor;
+                } else {
+                    initTutor();
+                }
             }
         });
     </script>

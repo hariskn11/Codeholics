@@ -3,32 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Database Visualization</title>
+    <title>Admin Panel</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         table { border-collapse: collapse; margin: 20px 0; width: 100%; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Users Table</h1>
+        <h1>Admin Panel</h1>
+        <br><br>
+        <button id="truncateBtn" style="padding: 10px 20px; margin-bottom: 20px; background-color: red; color: white; border: none; cursor: pointer;">
+            Truncate All Tables
+        </button>
+        <br><br>
+        
+        <h2>Users Table</h2>
         <table id="usersTable">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Username</th>
                     <th>Email</th>
-                    <th>Password Hash</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
 
-        <h1>Student Details Table</h1>
+        <h2>Student Details Table</h2>
         <table id="studentDetailsTable">
             <thead>
                 <tr>
@@ -43,33 +49,53 @@
             </thead>
             <tbody></tbody>
         </table>
+        <h2>Scores Table</h2>
+        <table id="scoresTable">
+            <thead>
+                <tr>
+                    
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Tamil</th>
+                    <th>English</th>
+                    <th>Maths</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
     <script>
+        const authHeader = 'Basic ' + btoa('admin:admin123');
+
         async function loadData() {
             try {
-                const [usersResponse, detailsResponse] = await Promise.all([
-                    fetch('/api/admin/users'),
-                    fetch('/api/admin/student-details')
+                const [usersResponse, detailsResponse, scoresResponse] = await Promise.all([
+                    fetch('/api/admin/users', { headers: { Authorization: authHeader } }),
+                    fetch('/api/admin/student-details', { headers: { Authorization: authHeader } }),
+                    fetch('/api/scores', { headers: { Authorization: authHeader } })
                 ]);
-    
+
                 if (!usersResponse.ok) throw new Error(`Users error: ${usersResponse.status}`);
                 if (!detailsResponse.ok) throw new Error(`Details error: ${detailsResponse.status}`);
-    
-                const [users, details] = await Promise.all([
+                if (!scoresResponse.ok) throw new Error(`Scores error: ${scoresResponse.status}`);
+
+                const [users, details, scores] = await Promise.all([
                     usersResponse.json(),
-                    detailsResponse.json()
+                    detailsResponse.json(),
+                    scoresResponse.json()
                 ]);
-    
-                renderTable('#usersTable tbody', users, ['id', 'username', 'email', 'password']);
+
+                renderTable('#usersTable tbody', users, ['id', 'username', 'email']);
                 renderTable('#studentDetailsTable tbody', details, ['id', 'user_id', 'username', 'standard', 'school_name', 'dob', 'medium']);
-                
+                renderTable('#scoresTable tbody', scores.data, ['user_id', 'name', 'tamilScore', 'englishScore', 'mathsScore', 'date']);
             } catch (error) {
                 console.error('Error:', error);
                 showError(error.message);
             }
         }
-    
+
         function renderTable(selector, data, fields) {
             const tableBody = document.querySelector(selector);
             tableBody.innerHTML = data.map(item => `
@@ -78,7 +104,7 @@
                 </tr>
             `).join('');
         }
-    
+
         function showError(message) {
             const errorDiv = document.createElement('div');
             errorDiv.style.color = 'red';
@@ -86,7 +112,33 @@
             errorDiv.textContent = `Error: ${message}`;
             document.body.prepend(errorDiv);
         }
-    
+        document.getElementById('truncateBtn').addEventListener('click', async () => {
+            const confirmed = confirm("Are you sure you want to delete all users, student details, and scores?");
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch('/api/admin/truncate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': authHeader,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await res.json();
+                if (res.ok) {
+                    alert(result.message || 'Tables truncated successfully!');
+                    loadData(); // Refresh tables
+                } else {
+                    alert(result.error || 'Something went wrong.');
+                }
+            } catch (err) {
+                console.error('Truncate error:', err);
+                alert('Error occurred while truncating tables.');
+            }
+        });
+
+
         loadData();
     </script>
 </body>

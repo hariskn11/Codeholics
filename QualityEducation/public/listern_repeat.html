@@ -429,6 +429,85 @@
             }
         }
 
+        /* Guide Bot Styles */
+        .guide-bot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #56ccf2, #2f80ed);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        .guide-bot:hover {
+            transform: scale(1.1);
+        }
+
+        .guide-bot-icon {
+            font-size: 40px;
+            color: white;
+        }
+
+        .guide-message {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            max-width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10;
+            border: 3px solid #56ccf2;
+            animation: bounceIn 0.3s ease;
+        }
+
+        .guide-message:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+        }
+
+        .guide-message-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .guide-message-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .guide-message button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            min-width: auto;
+            margin: 0 5px;
+        }
+
+        .guide-message button.close-btn {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+        }
+
+        .guide-message button.repeat-btn {
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 600px) {
             h1 {
@@ -454,6 +533,23 @@
             
             .character {
                 font-size: 2em;
+            }
+            
+            .guide-bot {
+                width: 60px;
+                height: 60px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .guide-bot-icon {
+                font-size: 30px;
+            }
+            
+            .guide-message {
+                bottom: 85px;
+                right: 15px;
+                max-width: 250px;
             }
         }
     </style>
@@ -507,12 +603,26 @@
         <button onclick="nextWord()">Continue</button>
     </div>
 
+    <!-- Guide Bot Elements -->
+    <div class="guide-bot" id="guide-bot">
+        <div class="guide-bot-icon">🤖</div>
+    </div>
+    
+    <div class="guide-message" id="guide-message">
+        <div class="guide-message-text" id="guide-message-text">Welcome to Magic Words Adventure! I'm your guide. Click me anytime for help!</div>
+        <div class="guide-message-buttons">
+            <button class="repeat-btn" onclick="repeatGuideMessage()">🔊 Repeat</button>
+            <button class="close-btn" onclick="closeGuideMessage()">Close</button>
+        </div>
+    </div>
+
     <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
     <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
     <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
     <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" preload="auto"></audio>
     <audio id="popSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
     <audio id="animalSound" src="https://assets.mixkit.co/sfx/preview/mixkit-animal-squeaks-105.mp3" preload="auto"></audio>
+    <audio id="guideSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3" preload="auto"></audio>
 
     <script>
         // Game elements
@@ -524,6 +634,11 @@
         const stars = document.querySelectorAll('.star');
         const bubblesContainer = document.getElementById('bubbles-container');
         
+        // Guide bot elements
+        const guideBot = document.getElementById('guide-bot');
+        const guideMessage = document.getElementById('guide-message');
+        const guideMessageText = document.getElementById('guide-message-text');
+        
         // Audio elements
         const correctSound = document.getElementById('correctSound');
         const wrongSound = document.getElementById('wrongSound');
@@ -531,6 +646,7 @@
         const clickSound = document.getElementById('clickSound');
         const popSound = document.getElementById('popSound');
         const animalSound = document.getElementById('animalSound');
+        const guideSound = document.getElementById('guideSound');
         
         // Game variables
         let recognition;
@@ -539,6 +655,8 @@
         let currentIndex = 0;
         let correctInRow = 0;
         let isTransitioning = false;
+        let currentGuideMessage = "";
+        let guideUtterance = null;
         
         // Words database by level
         const wordsByLevel = [
@@ -552,6 +670,20 @@
             ["Practice makes perfect", "Learning is so much fun", "Can you say this sentence?", "The quick fox jumps"]
         ];
         
+        // Guide messages
+        const guideMessages = {
+            welcome: "Welcome to Magic Words Adventure! I'm your guide. Click me anytime for help!",
+            instructions: "Here's how to play: First, listen to the word by clicking Play Sound. Then try saying it by clicking Speak Now!",
+            correct: "Great job! You said it perfectly! Keep going!",
+            incorrect: "Almost! Try again. Listen carefully to the word and say it just like that.",
+            levelUp: "Wow! You leveled up! You're doing amazing!",
+            playSound: "Click the Play Sound button to hear the word again.",
+            speakNow: "Now try saying the word! Click the Speak Now button and say it out loud.",
+            encouragement: "You're doing great! Keep practicing and you'll get even better!",
+            stars: "Collect stars by saying words correctly. Get 5 stars to level up!",
+            help: "Need help? Just click the Play Sound button to hear the word again, then try saying it!"
+        };
+        
         // Initialize the game
         function initGame() {
             initializeSpeechRecognition();
@@ -559,6 +691,11 @@
             updateScoreDisplay();
             createBubbles();
             startAnimalSounds();
+            
+            // Show initial guide message
+            setTimeout(() => {
+                showGuideMessage('welcome');
+            }, 1500);
         }
         
         // Create floating bubbles
@@ -626,6 +763,17 @@
             shuffleArray(words);
             currentIndex = 0;
             loadWord();
+            
+            // Show level-specific guidance
+            if (level === 1) {
+                setTimeout(() => {
+                    showGuideMessage('instructions');
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    showGuideMessage('encouragement');
+                }, 1000);
+            }
         }
         
         // Initialize speech recognition
@@ -650,6 +798,9 @@
                     
                     // Speak the word again when there's an error
                     speakWord(words[currentIndex]);
+                    
+                    // Show help message
+                    showGuideMessage('help');
                 };
                 
                 recognition.onspeechend = function() {
@@ -664,6 +815,11 @@
         
         // Speak a word using speech synthesis
         function speakWord(word) {
+            // Cancel any ongoing speech
+            if (guideUtterance) {
+                speechSynthesis.cancel();
+            }
+            
             const utterance = new SpeechSynthesisUtterance(word);
             
             // Set a fun voice if available
@@ -676,6 +832,32 @@
             }
             
             speechSynthesis.speak(utterance);
+        }
+        
+        // Speak a guide message
+        function speakGuideMessage(message) {
+            // Cancel any ongoing speech
+            if (guideUtterance) {
+                speechSynthesis.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(message);
+            
+            // Set a friendly voice if available
+            const voices = window.speechSynthesis.getVoices();
+            const friendlyVoice = voices.find(voice => voice.name.includes('Google UK Female') || voice.name.includes('Karen'));
+            if (friendlyVoice) {
+                utterance.voice = friendlyVoice;
+                utterance.pitch = 1.1;
+                utterance.rate = 0.9;
+            }
+            
+            guideUtterance = utterance;
+            speechSynthesis.speak(utterance);
+            
+            // Play guide sound
+            guideSound.currentTime = 0;
+            guideSound.play().catch(e => console.log("Guide sound error:", e));
         }
         
         // Load a new word
@@ -694,6 +876,11 @@
             progressBar.style.width = `${(correctInRow / 5) * 100}%`;
             updateStars();
             isTransitioning = false;
+            
+            // Show guidance after a short delay
+            setTimeout(() => {
+                showGuideMessage('playSound');
+            }, 1000);
         }
         
         // Update star display
@@ -721,6 +908,11 @@
             clickSound.play().catch(e => console.log("Click sound error:", e));
             
             speakWord(words[currentIndex]);
+            
+            // Show next guidance
+            setTimeout(() => {
+                showGuideMessage('speakNow');
+            }, 1500);
         }
         
         // Start listening
@@ -769,6 +961,9 @@
                 resultDisplay.style.color = "#2f80ed";
                 createEmojiFeedback(praise.emoji, "#2f80ed");
                 
+                // Show guide message
+                showGuideMessage('correct');
+                
                 // Speak the word again to reinforce learning
                 setTimeout(() => {
                     speakWord("Yes! " + currentWord);
@@ -793,6 +988,9 @@
                 resultDisplay.textContent = "Almost! Try again! " + ["🤔", "😅", "🙈"][Math.floor(Math.random()*3)];
                 resultDisplay.style.color = "#ff6b6b";
                 createEmojiFeedback("❌", "#ff6b6b");
+                
+                // Show guide message
+                showGuideMessage('incorrect');
                 
                 // Speak the correct word to help learning
                 setTimeout(() => {
@@ -858,6 +1056,9 @@
                 progressBar.style.width = "0%";
                 updateStars();
                 
+                // Show level up message
+                showGuideMessage('levelUp');
+                
                 // Load new level words
                 setTimeout(() => {
                     loadLevel();
@@ -908,6 +1109,37 @@
             }
             return array;
         }
+        
+        // Guide Bot Functions
+        function showGuideMessage(messageKey) {
+            if (guideMessages[messageKey]) {
+                currentGuideMessage = messageKey;
+                guideMessageText.textContent = guideMessages[messageKey];
+                guideMessage.style.display = 'block';
+                speakGuideMessage(guideMessages[messageKey]);
+            }
+        }
+        
+        function closeGuideMessage() {
+            guideMessage.style.display = 'none';
+            popSound.currentTime = 0;
+            popSound.play().catch(e => console.log("Pop sound error:", e));
+        }
+        
+        function repeatGuideMessage() {
+            if (currentGuideMessage) {
+                speakGuideMessage(guideMessages[currentGuideMessage]);
+            }
+        }
+        
+        // Set up guide bot click handler
+        guideBot.addEventListener('click', function() {
+            if (guideMessage.style.display === 'block') {
+                closeGuideMessage();
+            } else {
+                showGuideMessage('help');
+            }
+        });
         
         // Start the game when the page loads
         window.addEventListener('DOMContentLoaded', () => {

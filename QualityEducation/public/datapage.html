@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Scholarship Evaluation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .avatar-section {
+            grid-column: 1;
+            grid-row: 1;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .personal-details {
+            grid-column: 1;
+            grid-row: 2;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scores {
+            grid-column: 2;
+            grid-row: 1;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        
+        .decision {
+            grid-column: 2;
+            grid-row: 2;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #4a89dc;
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            color: #4a89dc;
+            margin-top: 0;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            color: #4a89dc;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .decision-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .decision-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .btn-agree {
+            background-color: #37bc9b;
+            color: white;
+        }
+        
+        .btn-disagree {
+            background-color: #e9573f;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+            }
+            
+            .avatar-section {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            
+            .personal-details {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            
+            .scores {
+                grid-column: 1;
+                grid-row: 3;
+            }
+            
+            .decision {
+                grid-column: 1;
+                grid-row: 4;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Top: Student Avatar -->
+        <div class="avatar-section">
+            <h2>Student Avatar</h2>
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Student Avatar" class="avatar" id="studentAvatar">
+            <h3 id="studentName">John Doe</h3>
+            <p id="studentId">ID: S12345678</p>
+        </div>
+        
+        <!-- Left Bottom: Personal Details -->
+        <div class="personal-details">
+            <h2>Personal Details</h2>
+            <div class="detail-item">
+                <span class="detail-label">Full Name:</span>
+                <span id="fullName">John Michael Doe</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Date of Birth:</span>
+                <span id="dob">15/03/2002</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Parent's Phone:</span>
+                <span id="phone">+1 (555) 123-4567</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Address:</span>
+                <span id="address">123 University Ave, Campus Town, ST 12345</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Grade:</span>
+                <span id="grade">1</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">School:</span>
+                <span id="school">Government Higher Secondary School</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Medium of Language:</span>
+                <span id="medium">Tamil</span>
+            </div>
+        </div>
+        
+        <!-- Right Top: Academic Scores -->
+        <div class="scores">
+            <h2>Academic Performance (Out of 10)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Term 1</th>
+                        <th>Term 2</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody id="scoresTable">
+                    <!-- Scores will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Right Bottom: Scholarship Decision -->
+        <div class="decision">
+            <div>
+                <h2>Scholarship Decision</h2>
+                <p class="decision-text">
+                    Based on the student's academic performance and personal profile, 
+                    Are you willing to accept this student for the scholarship program?
+                </p>
+            </div>
+            <div class="decision-buttons">
+                <button class="btn btn-disagree" id="disagreeBtn">Financial Aid Rejection</button>
+                <button class="btn btn-agree" id="agreeBtn">Financial Aid Acceptance</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Updated data with only English, Mathematics, Tamil and scores out of 10
+        const studentData = {
+            name: "John Michael Doe",
+            avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+            id: "S12345678",
+            dob: "15/03/2002",
+            phone: "+1 (555) 123-4567",
+            address: "123 University Ave, Campus Town, ST 12345",
+            grade: "1",
+            school: "Government Higher Secondary School",
+            medium: "Tamil",
+            scores: [
+                { 
+                    subject: "English", 
+                    term1: 8.5, 
+                    term2: 9.2,
+                    average: function() { return ((this.term1 + this.term2) / 2).toFixed(1); }
+                },
+                { 
+                    subject: "Mathematics", 
+                    term1: 9.5, 
+                    term2: 9.0,
+                    average: function() { return ((this.term1 + this.term2) / 2).toFixed(1); }
+                },
+                { 
+                    subject: "Tamil", 
+                    term1: 8.0, 
+                    term2: 8.8,
+                    average: function() { return ((this.term1 + this.term2) / 2).toFixed(1); }
+                }
+            ]
+        };
+
+        // Populate the page with student data
+        document.addEventListener('DOMContentLoaded', function() {
+            // Avatar and basic info
+            document.getElementById('studentAvatar').src = studentData.avatar;
+            document.getElementById('studentName').textContent = studentData.name;
+            document.getElementById('studentId').textContent = `ID: ${studentData.id}`;
+            
+            // Personal details
+            document.getElementById('fullName').textContent = studentData.name;
+            document.getElementById('dob').textContent = studentData.dob;
+            document.getElementById('phone').textContent = studentData.phone;
+            document.getElementById('address').textContent = studentData.address;
+            document.getElementById('grade').textContent = studentData.grade;
+            document.getElementById('school').textContent = studentData.school;
+            document.getElementById('medium').textContent = studentData.medium;
+            
+            // Academic scores table
+            const scoresTable = document.getElementById('scoresTable');
+            studentData.scores.forEach(subject => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${subject.subject}</td>
+                    <td>${subject.term1}/10</td>
+                    <td>${subject.term2}/10</td>
+                    <td>${subject.average()}/10</td>
+                `;
+                scoresTable.appendChild(row);
+            });
+            
+            // Decision buttons
+            document.getElementById('agreeBtn').addEventListener('click', function() {
+                alert('Thank you! Financial aid has been approved for this student.');
+            });
+            
+            document.getElementById('disagreeBtn').addEventListener('click', function() {
+                const reason = prompt('Please specify the reason for rejecting financial aid:');
+                if (reason) {
+                    alert(`Financial aid rejected. Reason recorded: "${reason}"`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

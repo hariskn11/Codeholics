@@ -105,6 +105,12 @@
             font-weight: 600;
             line-height: 1.1;
             margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .hero-description {
@@ -151,38 +157,6 @@
 
         .profile-btn:hover {
             background-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .category-section {
-            margin-top: 40px;
-        }
-
-        .category-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-
-        .category-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .category-btn {
-            background: none;
-            border: 1px solid #adb5bd;
-            color: #adb5bd;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: all 0.3s;
-        }
-
-        .category-btn:hover,
-        .category-btn.active {
-            background-color: #8257e6;
-            border-color: #8257e6;
-            color: white;
         }
 
         /* Student Images Section */
@@ -265,6 +239,145 @@
             bottom: 200px;
             left: 190px;
         }
+
+        /* Guide Bot Styles */
+        .guide-bot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #56ccf2, #2f80ed);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        .guide-bot:hover {
+            transform: scale(1.1);
+        }
+
+        .guide-bot-icon {
+            font-size: 40px;
+            color: white;
+        }
+
+        .guide-message {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            max-width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10;
+            border: 3px solid #56ccf2;
+            animation: bounceIn 0.3s ease;
+            color: #333;
+        }
+
+        .guide-message:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+        }
+
+        .guide-message-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .guide-message-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .guide-message button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            min-width: auto;
+            margin: 0 5px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-message button.close-btn {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+        }
+
+        .guide-message button.repeat-btn {
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-section {
+                flex-direction: column;
+            }
+            
+            .hero-content, .student-images {
+                width: 100%;
+            }
+            
+            .student-images {
+                margin-top: 40px;
+                height: 400px;
+            }
+            
+            .image-container {
+                height: 400px;
+            }
+            
+            .hero-title {
+                font-size: 48px;
+            }
+            
+            .guide-bot {
+                width: 60px;
+                height: 60px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .guide-bot-icon {
+                font-size: 30px;
+            }
+            
+            .guide-message {
+                bottom: 85px;
+                right: 15px;
+                max-width: 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -296,14 +409,14 @@
                 <h1 class="hero-title" id="welcomeTitle">Welcome!</h1>
                 <p class="hero-description">Learn with fun is a platform where students can study their subjects with games.</p>
                 <div class="hero-buttons">
-                    <button class="games-btn">Games</button>
-                    <button class="profile-btn">Profile</button>
+                    <button class="games-btn" id="gamesBtn">Games</button>
+                    <button class="profile-btn" id="profileBtn">Profile</button>
                 </div>
             </div>
             <div class="student-images">
                 <div class="image-container">
                     <div class="student-card tall-card purple-bg">
-                        <img src="https://i.pinimg.com/736x/fc/b7/57/fcb757fc93ca27dd0d3edba7a0f68df4.jpg" alt="Boy smiling ">
+                        <img src="https://i.pinimg.com/736x/fc/b7/57/fcb757fc93ca27dd0d3edba7a0f68df4.jpg" alt="Boy smiling">
                     </div>
                     <div class="student-card orange-bg">
                         <img src="https://images.unsplash.com/photo-1629872430082-93d8912beccf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Student in uniform reading a book">
@@ -325,10 +438,43 @@
         </div>
     </div>
 
+    <!-- Guide Bot Elements -->
+    <div class="guide-bot" id="guide-bot">
+        <div class="guide-bot-icon">🤖</div>
+    </div>
+    
+    <div class="guide-message" id="guide-message">
+        <div class="guide-message-text" id="guide-message-text">Welcome to Learn with Fun! I'm your learning guide!</div>
+        <div class="guide-message-buttons">
+            <button class="repeat-btn" id="repeat-btn">🔊 Repeat</button>
+            <button class="close-btn" id="close-btn">Close</button>
+        </div>
+    </div>
+
+    <audio id="guideSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3" preload="auto"></audio>
+    <audio id="popSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const signOutBtn = document.getElementById('signOutBtn');
             const welcomeTitle = document.getElementById('welcomeTitle');
+            const gamesBtn = document.getElementById('gamesBtn');
+            const profileBtn = document.getElementById('profileBtn');
+            const guideBot = document.getElementById('guide-bot');
+            const guideMessage = document.getElementById('guide-message');
+            const guideMessageText = document.getElementById('guide-message-text');
+            const repeatBtn = document.getElementById('repeat-btn');
+            const closeBtn = document.getElementById('close-btn');
+            const guideSound = document.getElementById('guideSound');
+            const popSound = document.getElementById('popSound');
+            
+            // State variables
+            let guideUtterance = null;
+            let currentGuideMessage = "";
+            let voicesLoaded = false;
+
+            // User data
             const userId = localStorage.getItem('userId');
             const username = localStorage.getItem('username');
 
@@ -339,6 +485,18 @@
                 welcomeTitle.textContent = `Welcome ${username}!`;
             }
 
+            // Guide messages
+            const guideMessages = {
+                welcome: `Hello ${username || 'there'}! I'm your learning guide! Let me show you around.`,
+                about: "This section tells you all about our learning platform and its mission.",
+                academy: "Here you'll find all our courses and learning programs.",
+                features: "Discover all the cool features that make learning fun here!",
+                games: "Click the blue Games button to play fun educational games!",
+                profile: "Click the Profile button to see your progress and achievements!",
+                actionGuide: "What would you like to do? I can help you get started!",
+                signOut: "Click here when you're ready to sign out."
+            };
+
             // Sign out functionality
             signOutBtn.addEventListener('click', function() {
                 localStorage.removeItem('userId');
@@ -346,17 +504,155 @@
                 window.location.href = '/dashboard.html';
             });
 
-            // Placeholder for profile button
-            document.querySelector('.profile-btn').addEventListener('click', function() {
-                // alert('Profile view not yet implemented');
+            // Navigation functionality
+            gamesBtn.addEventListener('click', function() {
+                window.location.href = '/games.html';
+            });
+
+            profileBtn.addEventListener('click', function() {
                 window.location.href = '/profile.html';
             });
 
-            // Placeholder for games button
-            document.querySelector('.games-btn').addEventListener('click', function() {
-                // alert('Games section not yet implemented');
-                window.location.href = '/games.html';
+            // Guide Bot Functions
+            function showGuideMessage(messageKey) {
+                if (guideMessages[messageKey]) {
+                    currentGuideMessage = messageKey;
+                    guideMessageText.textContent = guideMessages[messageKey];
+                    guideMessage.style.display = 'block';
+                    speakGuideMessage(guideMessages[messageKey]);
+                }
+            }
+
+            function closeGuideMessage() {
+                guideMessage.style.display = 'none';
+                playSound(popSound);
+                cancelSpeech();
+            }
+
+            function repeatGuideMessage() {
+                if (currentGuideMessage && guideMessages[currentGuideMessage]) {
+                    speakGuideMessage(guideMessages[currentGuideMessage]);
+                }
+            }
+
+            function cancelSpeech() {
+                if (guideUtterance) {
+                    speechSynthesis.cancel();
+                }
+            }
+
+            function playSound(sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Sound error:", e));
+            }
+
+            async function speakGuideMessage(message) {
+                cancelSpeech();
+                
+                if (!voicesLoaded) {
+                    const voices = await loadVoices();
+                    voicesLoaded = true;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(message);
+                
+                // Find a kid-friendly voice
+                const voices = speechSynthesis.getVoices();
+                const friendlyVoice = voices.find(voice => 
+                    voice.name.includes('Google UK Female') || 
+                    voice.name.includes('Karen') ||
+                    voice.name.includes('Samantha') ||
+                    voice.lang.includes('en-US')
+                );
+                
+                if (friendlyVoice) {
+                    utterance.voice = friendlyVoice;
+                    utterance.pitch = 1.2;  // Higher pitch for kid-friendliness
+                    utterance.rate = 0.9;   // Slightly slower speed
+                }
+                
+                guideUtterance = utterance;
+                speechSynthesis.speak(utterance);
+                playSound(guideSound);
+            }
+
+            function loadVoices() {
+                return new Promise(resolve => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length) {
+                        resolve(voices);
+                    } else {
+                        speechSynthesis.onvoiceschanged = () => {
+                            resolve(speechSynthesis.getVoices());
+                        };
+                    }
+                });
+            }
+
+            // Event Listeners
+            guideBot.addEventListener('click', function() {
+                if (guideMessage.style.display === 'block') {
+                    closeGuideMessage();
+                } else {
+                    showGuideMessage('welcome');
+                }
             });
+
+            repeatBtn.addEventListener('click', repeatGuideMessage);
+            closeBtn.addEventListener('click', closeGuideMessage);
+
+            // Navigation help
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    const section = this.textContent.toLowerCase();
+                    if (guideMessages[section]) {
+                        setTimeout(() => {
+                            showGuideMessage(section);
+                        }, 500);
+                    }
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    setTimeout(() => {
+                        if (!guideMessage.matches(':hover') && !guideBot.matches(':hover')) {
+                            closeGuideMessage();
+                        }
+                    }, 1000);
+                });
+            });
+
+            // Button help
+            gamesBtn.addEventListener('mouseenter', function() {
+                showGuideMessage('games');
+            });
+
+            profileBtn.addEventListener('mouseenter', function() {
+                showGuideMessage('profile');
+            });
+
+            signOutBtn.addEventListener('mouseenter', function() {
+                showGuideMessage('signOut');
+            });
+
+            // Guide message interactions
+            guideMessage.addEventListener('mouseleave', function() {
+                setTimeout(() => {
+                    if (!this.matches(':hover') && !guideBot.matches(':hover')) {
+                        closeGuideMessage();
+                    }
+                }, 1000);
+            });
+
+            // Initialize voices on first interaction
+            document.body.addEventListener('click', function initVoices() {
+                loadVoices();
+                document.body.removeEventListener('click', initVoices);
+            }, { once: true });
+
+            // Show initial guide message
+            setTimeout(() => {
+                showGuideMessage('welcome');
+            }, 1500);
         });
     </script>
 </body>

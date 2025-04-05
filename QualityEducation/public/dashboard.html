@@ -233,6 +233,145 @@
             bottom: 200px;
             left: 190px;
         }
+
+        /* Guide Bot Styles */
+        .guide-bot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #56ccf2, #2f80ed);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        .guide-bot:hover {
+            transform: scale(1.1);
+        }
+
+        .guide-bot-icon {
+            font-size: 40px;
+            color: white;
+        }
+
+        .guide-message {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            max-width: 300px;
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10;
+            border: 3px solid #56ccf2;
+            animation: bounceIn 0.3s ease;
+            color: #333;
+        }
+
+        .guide-message:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+        }
+
+        .guide-message-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .guide-message-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .guide-message button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            min-width: auto;
+            margin: 0 5px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-message button.close-btn {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+        }
+
+        .guide-message button.repeat-btn {
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-section {
+                flex-direction: column;
+            }
+            
+            .hero-content, .student-images {
+                width: 100%;
+            }
+            
+            .student-images {
+                margin-top: 40px;
+                height: 400px;
+            }
+            
+            .image-container {
+                height: 400px;
+            }
+            
+            .hero-title {
+                font-size: 48px;
+            }
+            
+            .guide-bot {
+                width: 60px;
+                height: 60px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .guide-bot-icon {
+                font-size: 30px;
+            }
+            
+            .guide-message {
+                bottom: 85px;
+                right: 15px;
+                max-width: 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -275,7 +414,7 @@
             <div class="student-images">
                 <div class="image-container">
                     <div class="student-card tall-card purple-bg">
-                        <img src="https://i.pinimg.com/736x/fc/b7/57/fcb757fc93ca27dd0d3edba7a0f68df4.jpg" alt="Boy smiling ">
+                        <img src="https://i.pinimg.com/736x/fc/b7/57/fcb757fc93ca27dd0d3edba7a0f68df4.jpg" alt="Boy smiling">
                     </div>
                     <div class="student-card orange-bg">
                         <img src="https://images.unsplash.com/photo-1629872430082-93d8912beccf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Student in uniform reading a book">
@@ -297,26 +436,212 @@
         </div>
     </div>
 
+    <!-- Guide Bot Elements -->
+    <div class="guide-bot" id="guide-bot">
+        <div class="guide-bot-icon">🤖</div>
+    </div>
+    
+    <div class="guide-message" id="guide-message">
+        <div class="guide-message-text" id="guide-message-text">Hi friend! I'm Sunny, your learning buddy! Click Sign Up if you're new or Login if you've been here before!</div>
+        <div class="guide-message-buttons">
+            <button class="repeat-btn" id="repeat-btn">🔊 Repeat</button>
+            <button class="close-btn" id="close-btn">Close</button>
+        </div>
+    </div>
+
+    <audio id="guideSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3" preload="auto"></audio>
+    <audio id="popSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3" preload="auto"></audio>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const signInBtn = document.querySelector('.sign-in-btn');
             const signupBtn = document.querySelector('.signup-btn');
             const loginBtn = document.querySelector('.login-btn');
+            const guideBot = document.getElementById('guide-bot');
+            const guideMessage = document.getElementById('guide-message');
+            const guideMessageText = document.getElementById('guide-message-text');
+            const repeatBtn = document.getElementById('repeat-btn');
+            const closeBtn = document.getElementById('close-btn');
+            const guideSound = document.getElementById('guideSound');
+            const popSound = document.getElementById('popSound');
+            
+            // State variables
+            let guideUtterance = null;
+            let currentGuideMessage = "";
+            let voicesLoaded = false;
 
-            // Redirect to login page
+            // Kid-friendly guide messages
+            const guideMessages = {
+                welcome: "Hi there! I'm Sunny, your learning buddy! Let's have fun while learning! Click on Sign Up if you're new, or Login if you've been here before!",
+                about: "This is a magical place where learning feels like playing games! Cool, right?",
+                signup: "Let's get you started! Click the blue Sign Up button to create your special learning account! It's quick and easy!",
+                login: "Welcome back! Click the white Login button to continue your fun learning adventure!",
+                features: "We have awesome games that teach math, reading, and science! You'll earn stars and badges too!",
+                help: "Need help? Just click the Sign Up or Login buttons to begin! I'll guide you through everything!",
+                encouragement: "You're doing great! Learning is more fun when we do it together!",
+                redirect: "Great choice! Let's go to the sign up/login page to start your learning adventure!"
+            };
+
+            // Initialize voices
+            function loadVoices() {
+                return new Promise(resolve => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length) {
+                        resolve(voices);
+                    } else {
+                        speechSynthesis.onvoiceschanged = () => {
+                            resolve(speechSynthesis.getVoices());
+                        };
+                    }
+                });
+            }
+
+            // Button redirects with guidance
             signInBtn.addEventListener('click', function() {
-                window.location.href = '/login.html';
+                showGuideMessage('redirect');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
             });
 
-            // Redirect to signup page
             signupBtn.addEventListener('click', function() {
-                window.location.href = '/signup.html';
+                showGuideMessage('redirect');
+                setTimeout(() => {
+                    window.location.href = '/signup.html';
+                }, 2000);
             });
 
-            // Redirect to login page
             loginBtn.addEventListener('click', function() {
-                window.location.href = '/login.html';
+                showGuideMessage('redirect');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
             });
+
+            // Show initial guide message
+            setTimeout(() => {
+                showGuideMessage('welcome');
+            }, 1500);
+
+            // Guide Bot Functions
+            function showGuideMessage(messageKey) {
+                if (guideMessages[messageKey]) {
+                    currentGuideMessage = messageKey;
+                    guideMessageText.textContent = guideMessages[messageKey];
+                    guideMessage.style.display = 'block';
+                    speakGuideMessage(guideMessages[messageKey]);
+                }
+            }
+
+            function closeGuideMessage() {
+                guideMessage.style.display = 'none';
+                playSound(popSound);
+                cancelSpeech();
+            }
+
+            function repeatGuideMessage() {
+                if (currentGuideMessage && guideMessages[currentGuideMessage]) {
+                    speakGuideMessage(guideMessages[currentGuideMessage]);
+                }
+            }
+
+            function cancelSpeech() {
+                if (guideUtterance) {
+                    speechSynthesis.cancel();
+                }
+            }
+
+            function playSound(sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Sound error:", e));
+            }
+
+            async function speakGuideMessage(message) {
+                cancelSpeech();
+                
+                if (!voicesLoaded) {
+                    const voices = await loadVoices();
+                    voicesLoaded = true;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(message);
+                
+                // Find a kid-friendly voice
+                const voices = speechSynthesis.getVoices();
+                const friendlyVoice = voices.find(voice => 
+                    voice.name.includes('Google UK Female') || 
+                    voice.name.includes('Karen') ||
+                    voice.name.includes('Samantha') ||
+                    voice.lang.includes('en-US')
+                );
+                
+                if (friendlyVoice) {
+                    utterance.voice = friendlyVoice;
+                    utterance.pitch = 1.2;  // Higher pitch for kid-friendliness
+                    utterance.rate = 0.9;   // Slightly slower speed
+                }
+                
+                guideUtterance = utterance;
+                speechSynthesis.speak(utterance);
+                playSound(guideSound);
+            }
+
+            // Event Listeners
+            guideBot.addEventListener('click', function() {
+                if (guideMessage.style.display === 'block') {
+                    closeGuideMessage();
+                } else {
+                    showGuideMessage('welcome');
+                }
+            });
+
+            repeatBtn.addEventListener('click', repeatGuideMessage);
+            closeBtn.addEventListener('click', closeGuideMessage);
+
+            // Navigation help
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    const section = this.textContent.toLowerCase();
+                    if (guideMessages[section]) {
+                        setTimeout(() => {
+                            showGuideMessage(section);
+                        }, 500);
+                    }
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    setTimeout(() => {
+                        if (!guideMessage.matches(':hover') && !guideBot.matches(':hover')) {
+                            closeGuideMessage();
+                        }
+                    }, 1000);
+                });
+            });
+
+            // Button help
+            signupBtn.addEventListener('mouseenter', function() {
+                showGuideMessage('signup');
+            });
+
+            loginBtn.addEventListener('mouseenter', function() {
+                showGuideMessage('login');
+            });
+
+            // Guide message interactions
+            guideMessage.addEventListener('mouseleave', function() {
+                setTimeout(() => {
+                    if (!this.matches(':hover') && !guideBot.matches(':hover')) {
+                        closeGuideMessage();
+                    }
+                }, 1000);
+            });
+
+            // Initialize voices on first interaction
+            document.body.addEventListener('click', function initVoices() {
+                loadVoices();
+                document.body.removeEventListener('click', initVoices);
+            }, { once: true });
         });
     </script>
 </body>

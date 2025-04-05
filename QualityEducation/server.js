@@ -31,7 +31,9 @@ db.serialize(() => {
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL
-    )`);
+    )`, (err) => {
+        if (err) console.error("Error creating users table:", err);
+    });
 
     db.run(`CREATE TABLE IF NOT EXISTS student_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,8 +43,36 @@ db.serialize(() => {
         dob TEXT NOT NULL,
         medium TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )`);
+    )`, (err) => {
+        if (err) console.error("Error creating student_details table:", err);
+    });
+
+    db.run(`CREATE TABLE IF NOT EXISTS LRgame (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        level INTEGER NOT NULL,
+        score INTEGER NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`, (err) => {
+        if (err) console.error("Error creating LRgame table:", err);
+        else console.log("LRgame table created successfully");
+    });
+    db.run(`CREATE TABLE IF NOT EXISTS scores (
+        user_id INTEGER,
+        name TEXT,
+        tamilScore INTEGER,
+        englishScore INTEGER,
+        mathsScore INTEGER,
+        date TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`, (err) => {
+        if (err) console.error("Error creating scores table:", err);
+        else console.log("Scores table created successfully");
+    });
+    
 });
+
 
 // Database helper functions
 const dbRun = (sql, params) => new Promise((resolve, reject) => {
@@ -96,6 +126,45 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
+app.post('/api/scores/manual', async (req, res) => {
+    try {
+        const { userId, name, tamilScore, englishScore, mathsScore, date } = req.body;
+
+        if (
+            userId == null || !name || tamilScore == null || englishScore == null ||
+            mathsScore == null || !date
+        ) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?,?,?,?,?,?) `,[1, "Methun_M", 7, 8, 9, "2025-04-05"]
+        );
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?,?,?,?,?,?) `,[2, "Haris", 9, 8, 9, "2025-04-05"]
+        );
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?,?,?,?,?,?) `,[3, "Varsini", 7, 6, 9, "2025-04-05"]
+        );
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?,?,?,?,?,?) `,[4, "Maahi", 7, 8, 8, "2025-04-05"]
+        );
+
+        res.status(201).json({
+            message: 'Manual score added successfully',
+            data: { userId, name, tamilScore, englishScore, mathsScore, date }
+        });
+    } catch (error) {
+        console.error('Error adding manual score:', error);
+        res.status(500).json({ error: 'Server error while adding manual score' });
+    }
+});
+
+
+
+
+
+
 app.post('/api/signup/details', async (req, res) => {
     try {
         const { userId, standard, school_name, dob, medium } = req.body;
@@ -129,6 +198,27 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+app.post('/api/admin/truncate', adminAuth, async (req, res) => {
+    try {
+        await dbRun('DELETE FROM users');
+        await dbRun('DELETE FROM student_details');
+        await dbRun('DELETE FROM scores');
+        await dbRun('DELETE FROM LRgame');
+
+        // Reset autoincrement IDs
+        await dbRun("DELETE FROM sqlite_sequence WHERE name = 'users'");
+        await dbRun("DELETE FROM sqlite_sequence WHERE name = 'student_details'");
+        await dbRun("DELETE FROM sqlite_sequence WHERE name = 'scores'");
+        await dbRun("DELETE FROM sqlite_sequence WHERE name = 'LRgame'");
+
+        res.json({ message: "All tables truncated and ID counters reset successfully!" });
+    } catch (error) {
+        console.error('Truncate error:', error);
+        res.status(500).json({ error: 'Error truncating tables' });
+    }
+});
+
+
 app.post('/api/profile', async (req, res) => {
     const { userId } = req.body;
 
@@ -157,6 +247,19 @@ app.post('/api/profile', async (req, res) => {
 });
 
 // Admin API endpoints
+app.get('/api/scores', async (req, res) => {
+    try {
+        const rows = await dbAll(`SELECT * FROM scores`);
+        res.status(200).json({
+            message: 'Scores retrieved successfully',
+            data: rows
+        });
+    } catch (error) {
+        console.error('Error retrieving scores:', error);
+        res.status(500).json({ error: 'Server error while retrieving scores' });
+    }
+});
+
 app.get('/api/admin/users', adminAuth, async (req, res) => {
     try {
         const users = await dbAll('SELECT * FROM users');
@@ -165,6 +268,80 @@ app.get('/api/admin/users', adminAuth, async (req, res) => {
         handleDbError(error, res, 'fetch users');
     }
 });
+app.get('/api/lrgame/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        const gameData = await dbAll(
+            'SELECT level, score, timestamp FROM LRgame WHERE user_id = ? ORDER BY timestamp DESC',
+            [userId]
+        );
+
+        res.json(gameData);
+    } catch (error) {
+        console.error('Error fetching game progress:', error);
+        res.status(500).json({ error: 'Server error fetching game progress' });
+    }
+});
+app.get('/api/seed/scores', async (req, res) => {
+    try {
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?, ?, ?, ?, ?, ?)`,
+            [1, "Methun_M", 7, 8, 9, "2025-04-05"]
+        );
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?, ?, ?, ?, ?, ?)`,
+            [2, "Haris", 9, 8, 9, "2025-04-05"]
+        );
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?, ?, ?, ?, ?, ?)`,
+            [3, "Varsini", 7, 6, 9, "2025-04-05"]
+        );
+        await dbRun(
+            `INSERT INTO scores (user_id, name, tamilScore, englishScore, mathsScore, date) VALUES (?, ?, ?, ?, ?, ?)`,
+            [4, "Maahi", 7, 8, 8, "2025-04-05"]
+        );
+
+        res.status(200).json({ message: "Seed data inserted into scores table" });
+    } catch (error) {
+        console.error('Error seeding scores:', error);
+        res.status(500).json({ error: 'Error inserting seed data' });
+    }
+});
+app.get('/api/scores', async (req, res) => {
+    try {
+      const rawScores = await dbAll(`SELECT * FROM scores ORDER BY user_id, date`);
+  
+      // Group scores by user_id
+      const grouped = {};
+      rawScores.forEach(score => {
+        if (!grouped[score.user_id]) {
+          grouped[score.user_id] = {
+            user_id: score.user_id,
+            name: score.name,
+            history: []
+          };
+        }
+        grouped[score.user_id].history.push({
+          date: score.date,
+          tamilScore: score.tamilScore,
+          englishScore: score.englishScore,
+          mathsScore: score.mathsScore
+        });
+      });
+  
+      const result = Object.values(grouped);
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error fetching scores' });
+    }
+  });
+  
 
 app.get('/api/admin/student-details', adminAuth, async (req, res) => {
     try {
@@ -276,4 +453,6 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Admin access: http://localhost:${PORT}/admin.html`);
     console.log('Admin credentials: admin / admin123');
+    // console.log("Generated scores:", { tamilScore, englishScore, mathsScore });
+
 });
